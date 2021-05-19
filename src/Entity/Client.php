@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\StudentRepository;
+use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=StudentRepository::class)
+ * @ORM\Entity(repositoryClass=ClientRepository::class)
  */
-class Student
+class Client
 {
     /**
      * @ORM\Id
@@ -35,20 +35,9 @@ class Student
     private $phone;
 
     /**
-     * @ORM\ManyToOne(targetEntity=SchoolYear::class, inversedBy="students")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $schoolYear;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Project::class, inversedBy="students")
+     * @ORM\ManyToMany(targetEntity=Project::class, mappedBy="clients")
      */
     private $projects;
-
-    /**
-     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="students")
-     */
-    private $tags;
 
     /**
      * @ORM\OneToOne(targetEntity=User::class, cascade={"persist", "remove"})
@@ -59,7 +48,6 @@ class Student
     public function __construct()
     {
         $this->projects = new ArrayCollection();
-        $this->tags = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,18 +91,6 @@ class Student
         return $this;
     }
 
-    public function getSchoolYear(): ?SchoolYear
-    {
-        return $this->schoolYear;
-    }
-
-    public function setSchoolYear(?SchoolYear $schoolYear): self
-    {
-        $this->schoolYear = $schoolYear;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Project[]
      */
@@ -127,6 +103,7 @@ class Student
     {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
+            $project->addClient($this);
         }
 
         return $this;
@@ -134,31 +111,9 @@ class Student
 
     public function removeProject(Project $project): self
     {
-        $this->projects->removeElement($project);
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Tag[]
-     */
-    public function getTags(): Collection
-    {
-        return $this->tags;
-    }
-
-    public function addTag(Tag $tag): self
-    {
-        if (!$this->tags->contains($tag)) {
-            $this->tags[] = $tag;
+        if ($this->projects->removeElement($project)) {
+            $project->removeClient($this);
         }
-
-        return $this;
-    }
-
-    public function removeTag(Tag $tag): self
-    {
-        $this->tags->removeElement($tag);
 
         return $this;
     }

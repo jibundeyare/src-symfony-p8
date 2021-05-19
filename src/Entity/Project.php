@@ -44,9 +44,26 @@ class Project
      */
     private $students;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Client::class, inversedBy="projects")
+     */
+    private $clients;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="projects")
+     */
+    private $tags;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Teacher::class, inversedBy="projects")
+     */
+    private $teacher;
+
     public function __construct()
     {
         $this->students = new ArrayCollection();
+        $this->clients = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -125,6 +142,66 @@ class Project
         if ($this->students->removeElement($student)) {
             $student->removeProject($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Client[]
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    public function addClient(Client $client): self
+    {
+        if (!$this->clients->contains($client)) {
+            $this->clients[] = $client;
+        }
+
+        return $this;
+    }
+
+    public function removeClient(Client $client): self
+    {
+        $this->clients->removeElement($client);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Tag[]
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(Tag $tag): self
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags[] = $tag;
+        }
+
+        return $this;
+    }
+
+    public function removeTag(Tag $tag): self
+    {
+        $this->tags->removeElement($tag);
+
+        return $this;
+    }
+
+    public function getTeacher(): ?Teacher
+    {
+        return $this->teacher;
+    }
+
+    public function setTeacher(?Teacher $teacher): self
+    {
+        $this->teacher = $teacher;
 
         return $this;
     }

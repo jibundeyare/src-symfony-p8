@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\SchoolYearRepository;
+use App\Repository\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=SchoolYearRepository::class)
+ * @ORM\Entity(repositoryClass=TagRepository::class)
  */
-class SchoolYear
+class Tag
 {
     /**
      * @ORM\Id
@@ -30,28 +30,24 @@ class SchoolYear
     private $description;
 
     /**
-     * @ORM\Column(type="date")
-     */
-    private $startDate;
-
-    /**
-     * @ORM\Column(type="date")
-     */
-    private $endDate;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Student::class, mappedBy="schoolYear")
+     * @ORM\ManyToMany(targetEntity=Student::class, mappedBy="tags")
      */
     private $students;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Teacher::class, inversedBy="schoolYears")
+     * @ORM\ManyToMany(targetEntity=Project::class, mappedBy="tags")
+     */
+    private $projects;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Teacher::class, mappedBy="tags")
      */
     private $teachers;
 
     public function __construct()
     {
         $this->students = new ArrayCollection();
+        $this->projects = new ArrayCollection();
         $this->teachers = new ArrayCollection();
     }
 
@@ -84,30 +80,6 @@ class SchoolYear
         return $this;
     }
 
-    public function getStartDate(): ?\DateTimeInterface
-    {
-        return $this->startDate;
-    }
-
-    public function setStartDate(\DateTimeInterface $startDate): self
-    {
-        $this->startDate = $startDate;
-
-        return $this;
-    }
-
-    public function getEndDate(): ?\DateTimeInterface
-    {
-        return $this->endDate;
-    }
-
-    public function setEndDate(\DateTimeInterface $endDate): self
-    {
-        $this->endDate = $endDate;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Student[]
      */
@@ -120,7 +92,7 @@ class SchoolYear
     {
         if (!$this->students->contains($student)) {
             $this->students[] = $student;
-            $student->setSchoolYear($this);
+            $student->addTag($this);
         }
 
         return $this;
@@ -129,10 +101,34 @@ class SchoolYear
     public function removeStudent(Student $student): self
     {
         if ($this->students->removeElement($student)) {
-            // set the owning side to null (unless already changed)
-            if ($student->getSchoolYear() === $this) {
-                $student->setSchoolYear(null);
-            }
+            $student->removeTag($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Project[]
+     */
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): self
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects[] = $project;
+            $project->addTag($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): self
+    {
+        if ($this->projects->removeElement($project)) {
+            $project->removeTag($this);
         }
 
         return $this;
@@ -150,6 +146,7 @@ class SchoolYear
     {
         if (!$this->teachers->contains($teacher)) {
             $this->teachers[] = $teacher;
+            $teacher->addTag($this);
         }
 
         return $this;
@@ -157,7 +154,9 @@ class SchoolYear
 
     public function removeTeacher(Teacher $teacher): self
     {
-        $this->teachers->removeElement($teacher);
+        if ($this->teachers->removeElement($teacher)) {
+            $teacher->removeTag($this);
+        }
 
         return $this;
     }

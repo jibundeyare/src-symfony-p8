@@ -2,15 +2,15 @@
 
 namespace App\Entity;
 
-use App\Repository\StudentRepository;
+use App\Repository\TeacherRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=StudentRepository::class)
+ * @ORM\Entity(repositoryClass=TeacherRepository::class)
  */
-class Student
+class Teacher
 {
     /**
      * @ORM\Id
@@ -35,18 +35,17 @@ class Student
     private $phone;
 
     /**
-     * @ORM\ManyToOne(targetEntity=SchoolYear::class, inversedBy="students")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToMany(targetEntity=SchoolYear::class, mappedBy="teachers")
      */
-    private $schoolYear;
+    private $schoolYears;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Project::class, inversedBy="students")
+     * @ORM\OneToMany(targetEntity=Project::class, mappedBy="teacher")
      */
     private $projects;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="students")
+     * @ORM\ManyToMany(targetEntity=Tag::class, inversedBy="teachers")
      */
     private $tags;
 
@@ -58,6 +57,7 @@ class Student
 
     public function __construct()
     {
+        $this->schoolYears = new ArrayCollection();
         $this->projects = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
@@ -103,14 +103,29 @@ class Student
         return $this;
     }
 
-    public function getSchoolYear(): ?SchoolYear
+    /**
+     * @return Collection|SchoolYear[]
+     */
+    public function getSchoolYears(): Collection
     {
-        return $this->schoolYear;
+        return $this->schoolYears;
     }
 
-    public function setSchoolYear(?SchoolYear $schoolYear): self
+    public function addSchoolYear(SchoolYear $schoolYear): self
     {
-        $this->schoolYear = $schoolYear;
+        if (!$this->schoolYears->contains($schoolYear)) {
+            $this->schoolYears[] = $schoolYear;
+            $schoolYear->addTeacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSchoolYear(SchoolYear $schoolYear): self
+    {
+        if ($this->schoolYears->removeElement($schoolYear)) {
+            $schoolYear->removeTeacher($this);
+        }
 
         return $this;
     }
@@ -127,6 +142,7 @@ class Student
     {
         if (!$this->projects->contains($project)) {
             $this->projects[] = $project;
+            $project->setTeacher($this);
         }
 
         return $this;
@@ -134,7 +150,12 @@ class Student
 
     public function removeProject(Project $project): self
     {
-        $this->projects->removeElement($project);
+        if ($this->projects->removeElement($project)) {
+            // set the owning side to null (unless already changed)
+            if ($project->getTeacher() === $this) {
+                $project->setTeacher(null);
+            }
+        }
 
         return $this;
     }
