@@ -142,3 +142,17 @@ Attributs :
 Relations :
 
 - aucune
+
+## Dépendances
+
+- Client
+  - User
+- Project
+- SchoolYear
+- Student
+  - SchoolYear
+  - User
+- Tag
+- Teacher
+  - User
+- User
