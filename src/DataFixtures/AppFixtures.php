@@ -26,10 +26,34 @@ class AppFixtures extends Fixture
         $schoolYearCount = 10;
         $studentsPerSchoolYear = 25;
 
+        $this->loadAdmins($manager, 3);
         $schoolYears = $this->loadSchoolYears($manager, $schoolYearCount);
         $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsPerSchoolYear * $schoolYearCount);
 
         $manager->flush();
+    }
+
+    public function loadAdmins(ObjectManager $manager, int $count)
+    {
+        $user = new User();
+        $user->setEmail('admin@example.com');
+        // hashage du mot de passe
+        $password = $this->encoder->encodePassword($user, '123');
+        $user->setPassword($password);
+        $user->setRoles(['ROLE_ADMIN']);
+
+        $manager->persist($user);
+
+        for ($i = 1; $i < $count; $i++) {
+            $user = new User();
+            $user->setEmail($this->faker->email());
+            // hashage du mot de passe
+            $password = $this->encoder->encodePassword($user, '123');
+            $user->setPassword($password);
+            $user->setRoles(['ROLE_ADMIN']);
+
+            $manager->persist($user);
+        }
     }
 
     public function loadSchoolYears(ObjectManager $manager, int $count)
