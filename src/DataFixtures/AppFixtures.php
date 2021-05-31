@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Project;
 use App\Entity\Student;
 use App\Entity\User;
 use App\Entity\SchoolYear;
@@ -24,11 +25,22 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         $schoolYearCount = 10;
-        $studentsPerSchoolYear = 25;
+        $studentsPerSchoolYear = 24;
+        $studentsCount = $studentsPerSchoolYear * $schoolYearCount;
+        $studentsPerProject = 3;
+
+        if ($studentsCount % $studentsPerProject == 0) {
+            // valeur plancher
+            $projectsCount = (int) ($studentsCount / $studentsPerProject);
+        } else {
+            // valeur plafond
+            $projectsCount = (int) ($studentsCount / $studentsPerProject) + 1;
+        }
 
         $this->loadAdmins($manager, 3);
         $schoolYears = $this->loadSchoolYears($manager, $schoolYearCount);
-        $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsPerSchoolYear * $schoolYearCount);
+        $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsCount);
+        $projects = $this->loadProjects($manager, $students, $studentsPerProject, $projectsCount);
 
         $manager->flush();
     }
@@ -147,5 +159,53 @@ class AppFixtures extends Fixture
         }
 
         return $students;
+    }
+
+    public function loadProjects(ObjectManager $manager, array $students, int $studentsPerProject, int $count)
+    {
+        $studentIndex = 0;
+        $projects = [];
+
+        // création du premier projet avec des données en dur
+        $project = new Project();
+        $project->setName('Hackathon');
+
+        while (true) {
+            $student = $students[$studentIndex];
+            $project->addStudent($student);
+            
+            if (($studentIndex + 1) % $studentsPerProject == 0) {
+                $studentIndex++;
+                break;
+            }
+
+            $studentIndex++;
+        }
+
+        $manager->persist($project);
+        $projects[] = $project;
+
+        // création des projets suivants avec des données aléatoires
+        for ($i = 1; $i < $count; $i++) {
+            $project = new Project();
+            $project->setName($this->faker->sentence(2));
+
+            while (true) {
+                $student = $students[$studentIndex];
+                $project->addStudent($student);
+        
+                if (($studentIndex + 1) % $studentsPerProject == 0) {
+                    $studentIndex++;
+                    break;
+                }
+
+                $studentIndex++;
+            }
+        
+            $manager->persist($project);
+            $projects[] = $project;
+        }
+
+        return $projects;
     }
 }

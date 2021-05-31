@@ -53,8 +53,8 @@ Attributs :
 
 - id : primary key
 - name : varchar 190
-- description : text
-- deadline : timestamp
+- description : text, nullable
+- deadline : timestamp, nullable
 - budget : int, nullable
 - creationDate : timestamp, default now
 - modificationDate : timestamp, nullable, default now
