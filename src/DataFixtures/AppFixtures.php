@@ -60,7 +60,21 @@ class AppFixtures extends Fixture
     {
         $schoolYears = [];
 
-        for ($i = 0; $i < $count; $i++) {
+        $schoolYear = new SchoolYear();
+        $schoolYear->setName('Lorem ipsum');
+        $schoolYear->setStartDate(\DateTime::createFromFormat('Y-m-d H:i:s', '2010-01-01 00:00:00'));
+        // récupération de la date de début
+        $startDate = $schoolYear->getStartDate();
+        // création de la date de fin à  partir de la date de début
+        $endDate = \DateTime::createFromFormat('Y-m-d H:i:s', $startDate->format('Y-m-d H:i:s'));
+        // ajout d'un interval de 4 mois à la date de début
+        $endDate->add(new \DateInterval('P4M'));
+        $schoolYear->setEndDate($endDate);
+
+        $manager->persist($schoolYear);
+        $schoolYears[] = $schoolYear;
+
+        for ($i = 1; $i < $count; $i++) {
             $schoolYear = new SchoolYear();
             $schoolYear->setName($this->faker->name());
             $schoolYear->setStartDate($this->faker->dateTimeThisDecade());
@@ -83,6 +97,27 @@ class AppFixtures extends Fixture
     {
         $students = [];
         $schoolYearIndex = 0;
+
+        $schoolYear = $schoolYears[$schoolYearIndex];
+
+        $user = new User();
+        $user->setEmail('student@example.com');
+        // hashage du mot de passe
+        $password = $this->encoder->encodePassword($user, '123');
+        $user->setPassword($password);
+        $user->setRoles(['ROLE_STUDENT']);
+
+        $manager->persist($user);
+
+        $student = new Student();
+        $student->setFirstname('Student');
+        $student->setLastname('Student');
+        $student->setPhone('0612345678');
+        $student->setSchoolYear($schoolYear);
+        $student->setUser($user);
+
+        $manager->persist($student);
+        $students[] = $student;
 
         for ($i = 1; $i <= $count; $i++) {
             $schoolYear = $schoolYears[$schoolYearIndex];
