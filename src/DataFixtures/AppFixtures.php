@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Entity\SchoolYear;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Faker\Factory as FakerFactory;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
@@ -17,55 +18,75 @@ class AppFixtures extends Fixture
     public function __construct(UserPasswordEncoderInterface $encoder)
     {
         $this->encoder = $encoder;
-        $this->faker = \Faker\Factory::create('fr_FR');
+        $this->faker = FakerFactory::create('fr_FR');
     }
 
     public function load(ObjectManager $manager)
     {
-        $schoolYears = $this->loadSchoolYears($manager);
-        $students = $this->loadStudents($manager, $schoolYears);
+        $schoolYearCount = 10;
+        $studentsPerSchoolYear = 25;
+
+        $schoolYears = $this->loadSchoolYears($manager, $schoolYearCount);
+        $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsPerSchoolYear * $schoolYearCount);
 
         $manager->flush();
     }
 
-    public function loadSchoolYears(ObjectManager $manager)
+    public function loadSchoolYears(ObjectManager $manager, int $count)
     {
-        $schoolYear = new SchoolYear();
-        $schoolYear->setName($this->faker->name());
-        $schoolYear->setStartDate($this->faker->dateTimeThisDecade());
-        // récupération de la date de début
-        $startDate = $schoolYear->getStartDate();
-        // ajout d'un interval de 4 mois à la date de début
-        $endDate = $startDate->add(new \DateInterval('P4M'));
-        $schoolYear->setEndDate($endDate);
+        $schoolYears = [];
 
-        $manager->persist($schoolYear);
+        for ($i = 0; $i < $count; $i++) {
+            $schoolYear = new SchoolYear();
+            $schoolYear->setName($this->faker->name());
+            $schoolYear->setStartDate($this->faker->dateTimeThisDecade());
+            // récupération de la date de début
+            $startDate = $schoolYear->getStartDate();
+            // création de la date de fin à  partir de la date de début
+            $endDate = \DateTime::createFromFormat('Y-m-d H:i:s', $startDate->format('Y-m-d H:i:s'));
+            // ajout d'un interval de 4 mois à la date de début
+            $endDate->add(new \DateInterval('P4M'));
+            $schoolYear->setEndDate($endDate);
 
-        return [$schoolYear];
+            $manager->persist($schoolYear);
+            $schoolYears[] = $schoolYear;
+        }
+
+        return $schoolYears;
     }
 
-    public function loadStudents(ObjectManager $manager, array $schoolYears)
+    public function loadStudents(ObjectManager $manager, array $schoolYears, int $studentsPerSchoolYear, int $count)
     {
-        $schoolYear = $schoolYears[0];
+        $students = [];
+        $schoolYearIndex = 0;
 
-        $user = new User();
-        $user->setEmail($this->faker->email());
-        // hashage du mot de passe
-        $password = $this->encoder->encodePassword($user, '123');
-        $user->setPassword($password);
-        $user->setRoles(['ROLE_STUDENT']);
+        for ($i = 1; $i <= $count; $i++) {
+            $schoolYear = $schoolYears[$schoolYearIndex];
 
-        $manager->persist($user);
+            if ($i % $studentsPerSchoolYear == 0) {
+                $schoolYearIndex++;
+            }
 
-        $student = new Student();
-        $student->setFirstname($this->faker->firstname());
-        $student->setLastname($this->faker->lastname());
-        $student->setPhone($this->faker->phoneNumber());
-        $student->setSchoolYear($schoolYear);
-        $student->setUser($user);
+            $user = new User();
+            $user->setEmail($this->faker->email());
+            // hashage du mot de passe
+            $password = $this->encoder->encodePassword($user, '123');
+            $user->setPassword($password);
+            $user->setRoles(['ROLE_STUDENT']);
 
-        $manager->persist($student);
+            $manager->persist($user);
 
-        return [$student];
+            $student = new Student();
+            $student->setFirstname($this->faker->firstname());
+            $student->setLastname($this->faker->lastname());
+            $student->setPhone($this->faker->phoneNumber());
+            $student->setSchoolYear($schoolYear);
+            $student->setUser($user);
+
+            $manager->persist($student);
+            $students[] = $student;
+        }
+
+        return $students;
     }
 }
