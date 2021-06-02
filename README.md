@@ -8,7 +8,7 @@ Cette appli permet de gérer une liste d'apprenants, leurs promos ainsi que leur
     cd src-symfony-p8
     composer install
 
-Après install du projet, créez le fichier `.env` en `.env.local` et ajoutez-y les variables `APP_ENV` et `DATABASE_URL`.
+Après install du projet, créez le fichier `.env.local` et ajoutez-y les variables `APP_ENV` et `DATABASE_URL`.
 
 Créez la BDD avec PhpMyAdmin.
 
