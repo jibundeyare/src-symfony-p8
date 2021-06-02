@@ -8,11 +8,12 @@ use App\Entity\Student;
 use App\Entity\Teacher;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory as FakerFactory;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class AppFixtures extends Fixture
+class AppFixtures extends Fixture implements FixtureGroupInterface
 {
     private $encoder;
     private $faker;
@@ -21,6 +22,17 @@ class AppFixtures extends Fixture
     {
         $this->encoder = $encoder;
         $this->faker = FakerFactory::create('fr_FR');
+    }
+
+    public static function getGroups(): array
+    {
+        // Cette fixture fait partie du groupe "test".
+        // Cela permet de cibler seulement certains fixtures
+        // quand on exécute la commande doctrine:fixtures:load.
+        // Pour que la méthode statique getGroups() soit prise
+        // en compte, il faut que la classe implémente
+        // l'interface FixtureGroupInterface.
+        return ['test'];
     }
 
     public function load(ObjectManager $manager)
@@ -45,6 +57,8 @@ class AppFixtures extends Fixture
         $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsCount);
         $projects = $this->loadProjects($manager, $students, $studentsPerProject, $projectsCount);
         $teachers = $this->loadTeachers($manager, $projects, 20);
+
+        // @todo créer les clients et les tags
 
         // enregistrement définitif dans la BDD
         // (envoi de la requête SQL à la BDD)
@@ -151,7 +165,7 @@ class AppFixtures extends Fixture
         $manager->persist($student);
         $students[] = $student;
 
-        for ($i = 1; $i <= $count; $i++) {
+        for ($i = 1; $i < $count; $i++) {
             $schoolYear = $schoolYears[$schoolYearIndex];
 
             if ($i % $studentsPerSchoolYear == 0) {
@@ -251,9 +265,11 @@ class AppFixtures extends Fixture
         $teacher->setPhone('0612345678');
         // affectation du compte user au profil qu'on vient de créer
         $teacher->setUser($user);
+        // récupération du premier projet de la liste
+        // et suppression de ce projet de la liste
+        $firstProject = array_shift($projects);
         // association du teacher et d'un projet constant
-        // le projet constant est le premier de la liste
-        $teacher->addProject($projects[0]);
+        $teacher->addProject($firstProject);
 
         $manager->persist($teacher);
 
@@ -275,9 +291,9 @@ class AppFixtures extends Fixture
 
             // création de profils teacher avec des données aléatoires
             $teacher = new Teacher();
-            $teacher->setFirstname('Teacher');
-            $teacher->setLastname('Teacher');
-            $teacher->setPhone('0612345678');
+            $teacher->setFirstname($this->faker->firstname());
+            $teacher->setLastname($this->faker->lastname());
+            $teacher->setPhone($this->faker->phoneNumber());
             // affectation du compte user au profil qu'on vient de créer
             $teacher->setUser($user);
 
