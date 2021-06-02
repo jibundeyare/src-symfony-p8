@@ -30,9 +30,22 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface
 
     public function load(ObjectManager $manager)
     {
-        // $product = new Product();
-        // $manager->persist($product);
+        $this->loadAdmin($manager);
 
         $manager->flush();
+    }
+
+    public function loadAdmin(ObjectManager $manager)
+    {
+        // création d'un user avec des données constantes
+        // ici il s'agit du compte admin
+        $user = new User();
+        $user->setEmail('admin@example.com');
+        // hashage du mot de passe
+        $password = $this->encoder->encodePassword($user, '123');
+        $user->setPassword($password);
+        $user->setRoles(['ROLE_ADMIN']);
+
+        $manager->persist($user);
     }
 }
