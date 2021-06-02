@@ -2,6 +2,26 @@
 
 Cette appli permet de gérer une liste d'apprenants, leurs promos ainsi que leurs projets.
 
+## Install
+
+    git clone https://github.com/jibundeyare/src-symfony-p8
+    cd src-symfony-p8
+    composer install
+
+Après install du projet, créez le fichier `.env` en `.env.local` et ajoutez-y les variables `APP_ENV` et `DATABASE_URL`.
+
+Créez la BDD avec PhpMyAdmin.
+
+Ensuite créez le schéma de la BDD et injectez les données de test avec la commande :
+
+    bin/dofilo.sh
+
+## Utilisation
+
+    symfony serve
+
+Ensuite visitez la page [http://localhost:8000](http://localhost:8000).
+
 ## Cahier des charges
 
 ### Student
