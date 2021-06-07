@@ -36,12 +36,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function findAllAdmins()
+    {
+        return $this->findByRole('ROLE_ADMIN');
+    }
+
     /**
      * @param $role string nom d'un rôle comme 'ROLE_ADMIN', 'ROLE_STUDENT', etc
      * @return User[] Returns an array of User objects
      */
     public function findByRole(string $role)
     {
+        // cette requête génère le code DQL suivant :
+        // "SELECT u FROM App\Entity\User u WHERE u.roles LIKE :role ORDER BY u.email ASC"
         // 'u' sera l'alias qui permet de désigner un user
         return $this->createQueryBuilder('u')
             // ajout d'un filtre qui ne retient que les users
