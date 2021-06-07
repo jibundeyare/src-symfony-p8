@@ -25,6 +25,7 @@ class TestController extends AbstractController
         // récupération d'un user de rôle ROLE_STUDENT
         $user = $studentRoles[0];
         // récupération du profil student à partir du compte user
+        // on précise qu'on se limite aux users qui ont le rôle ROLE_STUDENT 
         $student = $studentRepository->findOneByUser($user, 'ROLE_STUDENT');
         dump($user);
         dump($student);

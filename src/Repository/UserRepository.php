@@ -37,16 +37,28 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * @param $role string nom d'un rôle du type 'ROLE_ADMIN', 'ROLE_STUDENT', etc
+     * @param $role string nom d'un rôle comme 'ROLE_ADMIN', 'ROLE_STUDENT', etc
      * @return User[] Returns an array of User objects
      */
     public function findByRole(string $role)
     {
+        // 'u' sera l'alias qui permet de désigner un user
         return $this->createQueryBuilder('u')
+            // ajout d'un filtre qui ne retient que les users
+            // qui contiennent (opérateur LIKE) la chaîne de
+            // caractères contenue dans la variable :role
             ->andWhere('u.roles LIKE :role')
+            // affactation d'une valeur à la variable :role
+            // le symbole % est joker qui veut dire
+            // « match toutes les chaînes de caractères »
             ->setParameter('role', "%{$role}%")
+            // tri par adresse email en ordre croissant (a, b, c, ...)
             ->orderBy('u.email', 'ASC')
+            // récupération d'une requête qui n'attend qu'à être exécutée
             ->getQuery()
+            // exécution de la requête
+            // récupération d'un tableau de résultat
+            // ce tableau peut contenir, zéro, un ou plusieurs lignes
             ->getResult()
         ;
     }
