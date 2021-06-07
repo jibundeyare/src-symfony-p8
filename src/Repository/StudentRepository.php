@@ -15,6 +15,11 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class StudentRepository extends ServiceEntityRepository
 {
+    // importation du trait ProfileRepositoryTrait
+    // cette importation est commme un copier-coller
+    // dynamique du code
+    use ProfileRepositoryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Student::class);
@@ -36,14 +41,4 @@ class StudentRepository extends ServiceEntityRepository
         ;
     }
     */
-
-    public function findOneByUser(User $user): ?Student
-    {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.user = :user')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
 }

@@ -14,6 +14,11 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TeacherRepository extends ServiceEntityRepository
 {
+    // importation du trait ProfileRepositoryTrait
+    // cette importation est commme un copier-coller
+    // dynamique du code
+    use ProfileRepositoryTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Teacher::class);
