@@ -19,10 +19,13 @@ class TestController extends AbstractController
         $users = $userRepository->findAll();
         dump($users);
 
+        // récupération de la liste complète des users qui ont le rôle ROLE_STUDENT
+        $studentRoles = $userRepository->findByRole('ROLE_STUDENT');
+
         // récupération d'un user de rôle ROLE_STUDENT
-        $user = $users[50];
+        $user = $studentRoles[0];
         // récupération du profil student à partir du compte user
-        $student = $studentRepository->findOneByUser($user);
+        $student = $studentRepository->findOneByUser($user, 'ROLE_STUDENT');
         dump($user);
         dump($student);
         exit();

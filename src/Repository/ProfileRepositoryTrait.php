@@ -17,12 +17,15 @@ Trait ProfileRepositoryTrait
      * 
      * @return App\Entity\Client|App\Entity\Student|App\Entity\Teacher
      */
-    public function findOneByUser(User $user)
+    public function findOneByUser(User $user, string $role = '')
     {
         // p comme profil
         return $this->createQueryBuilder('p')
+            ->innerJoin('p.user', 'u')
             ->andWhere('p.user = :user')
+            ->andWhere('u.roles LIKE :role')
             ->setParameter('user', $user)
+            ->setParameter('role', "%{$role}%")
             ->getQuery()
             ->getOneOrNullResult()
         ;
