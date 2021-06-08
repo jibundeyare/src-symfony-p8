@@ -36,6 +36,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    // Cette fonction n'est pas indispensable car on pourrait remplacer
+    // son utilisation par un appel à $repository->findByRole('ROLE_ADMIN').
+    // Mais elle présente l'avantage de provoquer une erreur de PHP si nous
+    // nous trompons dans la syntaxe quand nous l'appelons. Par exemple
+    // appeler $repository->findAllAmins() sans 'd' provoquera une erreur fatale.
+    // Alors qu'appeler $repository->findByRole('ROLE_AMIN') ne provoquera pas
+    // d'erreur fatale et sera donc plus difficile à déboguer.
+    // En fonction des besoins, on peut décliner les autres fonctions :
+    // findAllStudents(), findAllTeachers(), findAllClients(), etc.
     public function findAllAdmins()
     {
         return $this->findByRole('ROLE_ADMIN');
@@ -47,28 +56,45 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function findByRole(string $role)
     {
-        // cette requête génère le code DQL suivant :
+        // Cette requête génère le code DQL suivant :
         // "SELECT u FROM App\Entity\User u WHERE u.roles LIKE :role ORDER BY u.email ASC"
-        // 'u' sera l'alias qui permet de désigner un user
+        // 'u' sera l'alias qui permet de désigner un user.
         return $this->createQueryBuilder('u')
-            // ajout d'un filtre qui ne retient que les users
+            // Ajout d'un filtre qui ne retient que les users
             // qui contiennent (opérateur LIKE) la chaîne de
-            // caractères contenue dans la variable :role
+            // caractères contenue dans la variable :role.
             ->andWhere('u.roles LIKE :role')
-            // affactation d'une valeur à la variable :role
-            // le symbole % est joker qui veut dire
-            // « match toutes les chaînes de caractères »
+            // Affactation d'une valeur à la variable :role.
+            // Le symbole % est joker qui veut dire
+            // « match toutes les chaînes de caractères ».
             ->setParameter('role', "%{$role}%")
-            // tri par adresse email en ordre croissant (a, b, c, ...)
+            // Tri par adresse email en ordre croissant (a, b, c, ...).
             ->orderBy('u.email', 'ASC')
-            // récupération d'une requête qui n'attend qu'à être exécutée
+            // Récupération d'une requête qui n'attend qu'à être exécutée.
             ->getQuery()
-            // exécution de la requête
-            // récupération d'un tableau de résultat
-            // ce tableau peut contenir, zéro, un ou plusieurs lignes
+            // Exécution de la requête.
+            // Récupération d'un tableau de résultat.
+            // Ce tableau peut contenir, zéro, un ou plusieurs lignes.
             ->getResult()
         ;
     }
+
+    // /**
+    //  * @return Student[] Returns an array of Student objects
+    //  */
+    /*
+    public function findByExampleField($value)
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('s.exampleField = :val')
+            ->setParameter('val', $value)
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+    */
 
     /*
     public function findOneBySomeField($value): ?User

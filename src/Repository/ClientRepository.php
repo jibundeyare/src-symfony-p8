@@ -14,9 +14,9 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ClientRepository extends ServiceEntityRepository
 {
-    // importation du trait ProfileRepositoryTrait
-    // cette importation est commme un copier-coller
-    // dynamique du code
+    // Importation du trait ProfileRepositoryTrait.
+    // Cette importation est commme un copier-coller
+    // dynamique du code.
     use ProfileRepositoryTrait;
 
     public function __construct(ManagerRegistry $registry)

@@ -60,8 +60,8 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
         // @todo créer les clients et les tags
 
-        // enregistrement définitif dans la BDD
-        // (envoi de la requête SQL à la BDD)
+        // Exécution des requêtes.
+        // C-à-d envoi de la requête SQL à la BDD.
         $manager->flush();
     }
 
@@ -76,6 +76,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $user->setPassword($password);
         $user->setRoles(['ROLE_ADMIN']);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
 
         // création de users avec des données aléatoires
@@ -88,6 +89,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $user->setPassword($password);
             $user->setRoles(['ROLE_ADMIN']);
 
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($user);
         }
     }
@@ -111,6 +113,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $endDate->add(new \DateInterval('P4M'));
         $schoolYear->setEndDate($endDate);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($schoolYear);
 
         // on ajoute la première school year créée
@@ -129,6 +132,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $endDate->add(new \DateInterval('P4M'));
             $schoolYear->setEndDate($endDate);
 
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($schoolYear);
 
             // on ajoute chaque school year créée
@@ -148,11 +152,12 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
         $user = new User();
         $user->setEmail('student@example.com');
-        // hashage du mot de passe
+        // Hashage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
         $user->setRoles(['ROLE_STUDENT']);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
 
         $student = new Student();
@@ -162,7 +167,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $student->setSchoolYear($schoolYear);
         $student->setUser($user);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($student);
+
         $students[] = $student;
 
         for ($i = 1; $i < $count; $i++) {
@@ -174,11 +181,12 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
             $user = new User();
             $user->setEmail($this->faker->email());
-            // hashage du mot de passe
+            // Hashage du mot de passe.
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
             $user->setRoles(['ROLE_STUDENT']);
 
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($user);
 
             $student = new Student();
@@ -188,6 +196,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $student->setSchoolYear($schoolYear);
             $student->setUser($user);
 
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($student);
             $students[] = $student;
         }
@@ -216,6 +225,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $studentIndex++;
         }
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($project);
         $projects[] = $project;
 
@@ -236,7 +246,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
                 $studentIndex++;
             }
         
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($project);
+
             $projects[] = $project;
         }
 
@@ -256,6 +268,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $user->setPassword($password);
         $user->setRoles(['ROLE_TEACHER']);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
 
         // création du profil teacher avec des données constantes
@@ -271,6 +284,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // association du teacher et d'un projet constant
         $teacher->addProject($firstProject);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($teacher);
 
         // ajout du teacher créé au tableau
@@ -287,6 +301,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $user->setPassword($password);
             $user->setRoles(['ROLE_TEACHER']);
 
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($user);
 
             // création de profils teacher avec des données aléatoires
@@ -307,6 +322,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
                 $teacher->addProject($randomProject);
             }
 
+            // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($teacher);
 
             // ajout du teacher créé au tableau

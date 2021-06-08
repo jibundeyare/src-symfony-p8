@@ -21,96 +21,98 @@ class TestController extends AbstractController
         StudentRepository $studentRepository,
         UserRepository $userRepository): Response
     {
-        // récupération de l'entity manager
+        // Récupération de l'entity manager.
         $entityManager = $this->getDoctrine()->getManager();
 
-        // récupération de la liste complète des admin
+        // Récupération de la liste complète des admins.
         $admins = $userRepository->findAllAdmins();
-        // récupération du dernier admin de la liste
+        // Récupération du dernier admin de la liste.
         $lastAdmin = end($admins);
 
         dump($lastAdmin);
 
-        // vérification de l'email de l'admin
-        // car on ne veut pas supprimer tous les comptes admin
+        // Vérification de l'email de l'admin car on ne veut
+        // pas supprimer tous les comptes admin.
         if ($lastAdmin->getEmail() != 'admin@example.com') {
-            // demande de suppression d'un objet
+            // Demande de suppression d'un objet.
             $entityManager->remove($lastAdmin);
-            // exécution de la requête SQL
+            // Exécution des requêtes.
+            // C-à-d envoi de la requête SQL à la BDD.
             $entityManager->flush();
         }
 
-        // récupération de la liste complète des school years
+        // Récupération de la liste complète des school years.
         $schoolYears = $schoolYearRepository->findAll();
-        // affectation d'une school year à la variable $schoolYear
+        // Affectation d'une school year à la variable $schoolYear.
         $schoolYear = $schoolYears[5];
 
-        // récupération de la liste complète des projects
+        // Récupération de la liste complète des projects.
         $projects = $projectRepository->findAll();
-        // affectation du premier projet à la variable $project1
+        // Affectation du premier projet à la variable $project1.
         $project1 = $projects[0];
-        // affectation du second projet à la variable $project2
+        // Affectation du second projet à la variable $project2.
         $project2 = $projects[1];
-        // affectation du troisième projet à la variable $project3
+        // Affectation du troisième projet à la variable $project3.
         $project3 = $projects[2];
 
-        // affichage de la liste des students reliés à un project
+        // Affichage de la liste des students reliés à un project.
         foreach ($project1->getStudents() as $studentProject1) {
             dump($studentProject1);
         }
 
-        // récupération du premier student
+        // Récupération du premier student.
         $student = $studentRepository->findAll()[10];
         dump($student);
-        // changement du téléphone du student
+        // Changement du téléphone du student.
         $student->setPhone('0687654321');
-        // changement de relation avec une school year
+        // Changement de relation avec une school year.
         $student->setSchoolYear($schoolYear);
-        // suppression d'une relation avec un project
+        // Suppression d'une relation avec un project.
         $student->removeProject($project1);
-        // ajout d'une relation avec un project
+        // Ajout d'une relation avec un project.
         $student->addProject($project2);
-        // ajout d'une relation avec un project
+        // Ajout d'une relation avec un project.
         $student->addProject($project3);
-        // enregistrement du changement dans la BDD
+        // Exécution des requêtes.
+        // C-à-d envoi de la requête SQL à la BDD.
         $entityManager->flush();
         dump($student);
 
-        // récupération de la liste complète des users
+        // Récupération de la liste complète des users.
         $users = $userRepository->findAll();
         dump($users);
 
-        // récupération de la liste complète des users qui ont le rôle ROLE_ADMIN
+        // Récupération de la liste complète des users qui ont le rôle ROLE_ADMIN.
         $admins = $userRepository->findAllAdmins();
         dump($admins);
 
-        // récupération de la liste complète des users qui ont le rôle ROLE_STUDENT
+        // Récupération de la liste complète des users qui ont le rôle ROLE_STUDENT.
         $studentRoles = $userRepository->findByRole('ROLE_STUDENT');
 
-        // récupération d'un user de rôle ROLE_STUDENT
+        // Récupération d'un user de rôle ROLE_STUDENT.
         $user = $studentRoles[0];
-        // récupération du profil student à partir du compte user
-        // on précise qu'on se limite aux users qui ont le rôle ROLE_STUDENT 
+        // Récupération du profil student à partir du compte user.
+        // On précise qu'on se limite aux users qui ont le rôle ROLE_STUDENT.
         $student = $studentRepository->findOneByUser($user, 'ROLE_STUDENT');
         dump($user);
         dump($student);
 
-        // récupération du user dont l'id est égal à 1
+        // Récupération du user dont l'id est égal à 1.
         $admin = $userRepository->find(1);
         dump($admin);
 
-        // récupération de la liste complète des students
+        // Récupération de la liste complète des students.
         $students = $studentRepository->findAll();
         dump($students);
 
-        // récupération du compte user d'un student
-        $firstStudent = $students[0];
-        $user = $firstStudent->getUser();
+        // Récupération du compte user d'un student.
+        $student = $students[0];
+        $user = $student->getUser();
         dump($user);
 
         // récupération du student dont l'id est égal à 1
-        $firstStudent = $studentRepository->find(1);
-        dump($firstStudent);
+        $student = $studentRepository->find(1);
+        dump($student);
 
         exit();
     }

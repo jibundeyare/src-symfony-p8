@@ -30,22 +30,26 @@ class ProdFixtures extends Fixture implements FixtureGroupInterface
 
     public function load(ObjectManager $manager)
     {
+        // Création des comptes admins
         $this->loadAdmin($manager);
 
+        // Exécution des requêtes.
+        // C-à-d envoi de la requête SQL à la BDD.
         $manager->flush();
     }
 
     public function loadAdmin(ObjectManager $manager)
     {
-        // création d'un user avec des données constantes
-        // ici il s'agit du compte admin
+        // Création d'un user avec des données constantes.
+        // Ici il s'agit du compte admin
         $user = new User();
         $user->setEmail('admin@example.com');
-        // hashage du mot de passe
+        // Hashage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
         $user->setRoles(['ROLE_ADMIN']);
 
+        // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
     }
 }
