@@ -64,6 +64,7 @@ class StudentRepository extends ServiceEntityRepository
         // Version plus simple du code mais qui n'est adpatée que
         // si on n'enchaîne des conditions de type OR ou AND et
         // pas des conditions mélangeant des OR et des AND.
+        // WHERE s.firstname LIKE :value OR s.lastname LIKE :value
         return $this->createQueryBuilder('s')
             ->where('s.firstname LIKE :value')
             ->orWhere('s.lastname LIKE :value')
