@@ -85,7 +85,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function loadAdmins(ObjectManager $manager, int $count)
     {
-        // Création d'un admin avec des données constantes.
+        // Création d'un nouveau user avec des données constantes.
         // Ici il s'agit d'un compte admin.
         $user = new User();
         $user->setEmail('admin@example.com');
@@ -100,14 +100,15 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
 
-        // Création d'admins avec des données aléatoires.
+        // Création de users avec des données aléatoires.
         // On démarre la boucle for avec $i = 1 et non $i = 0
         // car on a « déjà fait le premier tour » de la boucle
-        // quand on a créé notre premier admin ci-dessus.
-        // Si le développeur demande N admins, il faut retrancher
-        // le admin qui a été créé ci-dessus et en créer N-1
+        // quand on a créé notre premier user ci-dessus.
+        // Si le développeur demande N users, il faut retrancher
+        // le user qui a été créé ci-dessus et en créer N-1
         // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
+            // Création d'un nouveau user.
             $user = new User();
             $user->setEmail($this->faker->email());
             // Hashage du mot de passe.
@@ -165,6 +166,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // la school year qui a été créé ci-dessus et en créer N-1
         // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
+            // Création d'une nouvelle school year.
             $schoolYear = new SchoolYear();
             $schoolYear->setName($this->faker->name());
             $schoolYear->setStartDate($this->faker->dateTimeThisDecade());
@@ -246,6 +248,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
                 $schoolYearIndex++;
             }
 
+            // Création d'un nouveau user.
             $user = new User();
             $user->setEmail($this->faker->email());
             // Hashage du mot de passe.
@@ -259,10 +262,12 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($user);
 
+            // Création d'un nouveau student.
             $student = new Student();
             $student->setFirstname($this->faker->firstname());
             $student->setLastname($this->faker->lastname());
             $student->setPhone($this->faker->phoneNumber());
+            // Association d'un student et d'une school year. 
             $student->setSchoolYear($schoolYear);
             // Association du compte user et du profil student.
             $student->setUser($user);
