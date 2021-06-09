@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -11,6 +12,16 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    // Ce trait permet de rendre une entité horodatable.
+    // Mais pour qu'il soit fonctionnel, il faut activer
+    // la fonctionnalité dans le fichier de configuration
+    // config/packages/stof_doctrine_extensions.yaml en
+    // ajoutant le code suivant :
+    //    orm:
+    //        default:
+    //            timestampable: true
+    use TimestampableEntity;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Repository\ProjectRepository;
 use App\Repository\SchoolYearRepository;
 use App\Repository\StudentRepository;
@@ -23,6 +24,14 @@ class TestController extends AbstractController
     {
         // Récupération de l'entity manager.
         $entityManager = $this->getDoctrine()->getManager();
+
+        // Récupération du user dont l'id est 2.
+        $user = $userRepository->find(2);
+        // Changement de son adresse email.
+        $user->setEmail('foo@example.com');
+        // Exécution des requêtes.
+        // C-à-d envoi de la requête SQL à la BDD.
+        $entityManager->flush();
 
         // La chaîne de caractères qu'on veut rechercher dans le prénom
         // ou le nom de famille des students.
