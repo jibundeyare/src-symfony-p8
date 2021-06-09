@@ -4,14 +4,21 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false, hardDelete=false)
  */
 class User implements UserInterface
 {
+    // Ce trait permet de rendre une entité effaçable en douce.
+    // @todo compléter les commentaires
+    use SoftDeleteableEntity;
+
     // Ce trait permet de rendre une entité horodatable.
     // Mais pour qu'il soit fonctionnel, il faut activer
     // la fonctionnalité dans le fichier de configuration

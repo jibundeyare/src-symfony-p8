@@ -33,6 +33,20 @@ class TestController extends AbstractController
         // C-à-d envoi de la requête SQL à la BDD.
         $entityManager->flush();
 
+        // Demande de suppression d'un user.
+        $entityManager->remove($user);
+        // Exécution des requêtes.
+        // C-à-d envoi de la requête SQL à la BDD.
+        $entityManager->flush();
+
+        // @todo activer le filtre sur les objets softdeletés
+
+        // On veut vérifier que l'admin qui a été supprimé
+        // n'apparaît plus dans la liste complète des admins.
+        // Récupération de la liste complète des admins.
+        $admins = $userRepository->findAllAdmins();
+        dump($admins);
+
         // La chaîne de caractères qu'on veut rechercher dans le prénom
         // ou le nom de famille des students.
         $name = 'remy';
