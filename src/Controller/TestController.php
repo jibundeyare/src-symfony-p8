@@ -27,25 +27,37 @@ class TestController extends AbstractController
 
         // Récupération du user dont l'id est 2.
         $user = $userRepository->find(2);
-        // Changement de son adresse email.
-        $user->setEmail('foo@example.com');
-        // Exécution des requêtes.
-        // C-à-d envoi de la requête SQL à la BDD.
-        $entityManager->flush();
 
-        // Demande de suppression d'un user.
-        $entityManager->remove($user);
-        // Exécution des requêtes.
-        // C-à-d envoi de la requête SQL à la BDD.
-        $entityManager->flush();
+        if ($user) {
+            // Changement de son adresse email.
+            $user->setEmail('foo@example.com');
+            // Exécution des requêtes.
+            // C-à-d envoi de la requête SQL à la BDD.
+            $entityManager->flush();
+            
+            // Demande de suppression d'un user.
+            $entityManager->remove($user);
+            // Exécution des requêtes.
+            // C-à-d envoi de la requête SQL à la BDD.
+            $entityManager->flush();
+        }
 
-        // @todo activer le filtre sur les objets softdeletés
-
-        // On veut vérifier que l'admin qui a été supprimé
+        // On peut vérifier que l'admin qui a été supprimé en douce
         // n'apparaît plus dans la liste complète des admins.
         // Récupération de la liste complète des admins.
         $admins = $userRepository->findAllAdmins();
         dump($admins);
+
+        // On peut désactiver le filtrage des objets supprimés
+        // en douce.
+        $entityManager->getFilters()->disable('softdeleteable');
+        // Les admins supprimés en douce sont de nouveau visibles.
+        $admins = $userRepository->findAllAdmins();
+        dump($admins);
+
+        // On peut aussi réactiver le filtrage des objets supprimés
+        // en douce.
+        $entityManager->getFilters()->enable('softdeleteable');
 
         // La chaîne de caractères qu'on veut rechercher dans le prénom
         // ou le nom de famille des students.

@@ -15,8 +15,24 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
-    // Ce trait permet de rendre une entité effaçable en douce.
-    // @todo compléter les commentaires
+    // Ce trait permet de rendre une entité supprimable en douce.
+    // Mais pour qu'il soit fonctionnel, il faut activer
+    // la fonctionnalité dans le fichier de configuration
+    // config/packages/stof_doctrine_extensions.yaml en
+    // ajoutant le code suivant :
+    //    orm:
+    //        default:
+    //            softdeleteable: true
+    // dans la section stof_doctrine_extensions.
+    // Et pour que les objets supprimés en douce ne soient plus
+    // visible il faut activer le filtrage dans le fichier
+    // de configuration config/packages/doctrine.yaml
+    // en ajoutant le code suivant :
+    //         filters:
+    //             softdeleteable:
+    //                 class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
+    //                 enabled: true
+    // dans la section orm.
     use SoftDeleteableEntity;
 
     // Ce trait permet de rendre une entité horodatable.
@@ -27,6 +43,7 @@ class User implements UserInterface
     //    orm:
     //        default:
     //            timestampable: true
+    // dans la section stof_doctrine_extensions.
     use TimestampableEntity;
 
     /**
