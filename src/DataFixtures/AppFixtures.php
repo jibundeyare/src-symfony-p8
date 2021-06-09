@@ -37,25 +37,43 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function load(ObjectManager $manager)
     {
-        // on définit le nombre d'objets qu'il falloir créer
+        // Définition du nombre d'objets qu'il faut créer.
         $schoolYearCount = 10;
         $studentsPerSchoolYear = 24;
+        // Le nombre de students à créer dépend du nombre  de
+        // school years et du nombre de students par school year.
         $studentsCount = $studentsPerSchoolYear * $schoolYearCount;
         $studentsPerProject = 3;
 
+        // Le nombre de projects à créer dépend du nombre  de
+        // students et du nombre de students par project.
         if ($studentsCount % $studentsPerProject == 0) {
-            // valeur plancher
+            // Il y a suffisamment de projects pour chaque student.
+            // C-à-d que le reste de la division euclidienne (le
+            // modulo) est nulle.
+            // La division renvoit un float, c'est pourquoi il est nécessaire
+            // de type caster la valeur de la division en (int).
             $projectsCount = (int) ($studentsCount / $studentsPerProject);
         } else {
-            // valeur plafond
+            // Il n'y a pas suffisamment de projects pour chaque student.
+            // C-à-d que le reste de la division euclidienne (le
+            // modulo) n'est pas nulle.
+            // On rajoute un project supplémentaire.
+            // La division renvoit un float, c'est pourquoi il est nécessaire
+            // de type caster la valeur de la division en (int).
             $projectsCount = (int) ($studentsCount / $studentsPerProject) + 1;
         }
 
-        // on appelle les fonctions qui vont créer les objets dans la BDD
+        // Appel des fonctions qui vont créer les objets dans la BDD.
+        // La fonction loadAdmins() ne renvoit pas de données mais les autres
+        // fontions renvoit des données qui sont nécessaires à d'autres fonctions.
         $this->loadAdmins($manager, 3);
         $schoolYears = $this->loadSchoolYears($manager, $schoolYearCount);
+        // La fonction loadStudents() a besoin de la liste des school years.
         $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsCount);
+        // La fonction loadProjects() a besoin de la liste des students.
         $projects = $this->loadProjects($manager, $students, $studentsPerProject, $projectsCount);
+        // La fonction loadTeachers() a besoin de la liste des projects.
         $teachers = $this->loadTeachers($manager, $projects, 20);
 
         // @todo créer les clients et les tags
@@ -67,26 +85,37 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function loadAdmins(ObjectManager $manager, int $count)
     {
-        // création d'un user avec des données constantes
-        // ici il s'agit du compte admin
+        // Création d'un admin avec des données constantes.
+        // Ici il s'agit d'un compte admin.
         $user = new User();
         $user->setEmail('admin@example.com');
-        // hashage du mot de passe
+        // Hashage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
+        // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+        // est libre mais il vaut mieux suivre la convention
+        // proposée par Symfony.
         $user->setRoles(['ROLE_ADMIN']);
 
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
 
-        // création de users avec des données aléatoires
-        // @todo préciser pourquoi $i = 1 et pas $i = 0
+        // Création d'admins avec des données aléatoires.
+        // On démarre la boucle for avec $i = 1 et non $i = 0
+        // car on a « déjà fait le premier tour » de la boucle
+        // quand on a créé notre premier admin ci-dessus.
+        // Si le développeur demande N admins, il faut retrancher
+        // le admin qui a été créé ci-dessus et en créer N-1
+        // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
             $user = new User();
             $user->setEmail($this->faker->email());
-            // hashage du mot de passe
+            // Hashage du mot de passe.
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
+            // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+            // est libre mais il vaut mieux suivre la convention
+            // proposée par Symfony.
             $user->setRoles(['ROLE_ADMIN']);
 
             // Demande d'enregistrement d'un objet dans la BDD
@@ -96,82 +125,120 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function loadSchoolYears(ObjectManager $manager, int $count)
     {
-        // création d'un tableau qui contiendra les school years qu'on va créer
-        // la fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
-        // de création d'objects puissent utiliser les school years
+        // Création d'un tableau qui contiendra les school years qu'on va créer.
+        // La fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
+        // de création d'objets puissent les utiliser.
         $schoolYears = [];
 
-        // création d'une school year avec des données constantes
+        // Création d'une school year avec des données constantes.
         $schoolYear = new SchoolYear();
         $schoolYear->setName('Lorem ipsum');
+        // La fonction \DateTime::createFromFormat() permet de créer un objet
+        // de type DateTime en fournissant une date sous forme de chaîne
+        // de caractères.
+        // Y : année en 4 chiffres
+        // m : mois en 2 chiffres (le 0 est affiché quand m < 10)
+        // d : jour en 2 chiffres (le 0 est affiché quand d < 10)
+        // H : heure en 2 chiffres (le 0 est affiché quand H < 10)
+        // i : minute en 2 chiffres (le 0 est affiché quand i < 10)
+        // s : seconde en 2 chiffres (le 0 est affiché quand s < 10)
         $schoolYear->setStartDate(\DateTime::createFromFormat('Y-m-d H:i:s', '2010-01-01 00:00:00'));
-        // récupération de la date de début
+        // Récupération de la date de début.
         $startDate = $schoolYear->getStartDate();
-        // création de la date de fin à  partir de la date de début
+        // Création d'une date de fin à partir de la date de début.
         $endDate = \DateTime::createFromFormat('Y-m-d H:i:s', $startDate->format('Y-m-d H:i:s'));
-        // ajout d'un interval de 4 mois à la date de début
+        // Ajout d'un interval de 4 mois à la date de début.
         $endDate->add(new \DateInterval('P4M'));
         $schoolYear->setEndDate($endDate);
 
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($schoolYear);
 
-        // on ajoute la première school year créée
+        // Ajout de la première school year créée à la liste.
         $schoolYears[] = $schoolYear;
 
-        // création de school years avec des données aléatoires
+        // Création de school years avec des données aléatoires.
+        // On démarre la boucle for avec $i = 1 et non $i = 0
+        // car on a « déjà fait le premier tour » de la boucle
+        // quand on a créé notre première school year ci-dessus.
+        // Si le développeur demande N school years, il faut retrancher
+        // la school year qui a été créé ci-dessus et en créer N-1
+        // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
             $schoolYear = new SchoolYear();
             $schoolYear->setName($this->faker->name());
             $schoolYear->setStartDate($this->faker->dateTimeThisDecade());
-            // récupération de la date de début
+            // Récupération de la date de début.
             $startDate = $schoolYear->getStartDate();
-            // création de la date de fin à  partir de la date de début
+            // Création d'une date de fin à partir de la date de début.
             $endDate = \DateTime::createFromFormat('Y-m-d H:i:s', $startDate->format('Y-m-d H:i:s'));
-            // ajout d'un interval de 4 mois à la date de début
+            // Ajout d'un interval de 4 mois à la date de début.
             $endDate->add(new \DateInterval('P4M'));
             $schoolYear->setEndDate($endDate);
 
             // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($schoolYear);
 
-            // on ajoute chaque school year créée
+            // Ajout de la school year créée à la liste.
             $schoolYears[] = $schoolYear;
         }
 
-        // on renvoit toutes les school years qui ont été créées
+        // Renvoi de la liste des school years créées.
         return $schoolYears;
     }
 
     public function loadStudents(ObjectManager $manager, array $schoolYears, int $studentsPerSchoolYear, int $count)
     {
+        // Création d'un tableau qui contiendra les students qu'on va créer.
+        // La fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
+        // de création d'objets puissent les utiliser.
         $students = [];
+
+        // Création d'un compteur qui contient l'index de la school year en cours
+        // dans le tableau des school years.
+        // Assez logiquement, le premier index est 0 car on commence par
+        // utiliser la première school year.
         $schoolYearIndex = 0;
 
+        // Récupération de la première school year.
         $schoolYear = $schoolYears[$schoolYearIndex];
 
+        // Création d'un nouveau user.
         $user = new User();
         $user->setEmail('student@example.com');
         // Hashage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
+        // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+        // est libre mais il vaut mieux suivre la convention
+        // proposée par Symfony.
         $user->setRoles(['ROLE_STUDENT']);
 
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($user);
 
+        // Création d'un nouveau student.
         $student = new Student();
         $student->setFirstname('Student');
         $student->setLastname('Student');
         $student->setPhone('0612345678');
         $student->setSchoolYear($schoolYear);
+        // Association du compte user et du profil student.
         $student->setUser($user);
 
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($student);
 
+        // Ajout du premier student créé à la liste.
         $students[] = $student;
 
+        // Création de students avec des données aléatoires.
+        // On démarre la boucle for avec $i = 1 et non $i = 0
+        // car on a « déjà fait le premier tour » de la boucle
+        // quand on a créé notre premier student ci-dessus.
+        // Si le développeur demande N students, il faut retrancher
+        // le student qui a été créé ci-dessus et en créer N-1
+        // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
             $schoolYear = $schoolYears[$schoolYearIndex];
 
@@ -184,6 +251,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Hashage du mot de passe.
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
+            // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+            // est libre mais il vaut mieux suivre la convention
+            // proposée par Symfony.
             $user->setRoles(['ROLE_STUDENT']);
 
             // Demande d'enregistrement d'un objet dans la BDD
@@ -194,13 +264,17 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $student->setLastname($this->faker->lastname());
             $student->setPhone($this->faker->phoneNumber());
             $student->setSchoolYear($schoolYear);
+            // Association du compte user et du profil student.
             $student->setUser($user);
 
             // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($student);
+
+            // Ajout du student créé à la liste.
             $students[] = $student;
         }
 
+        // Renvoi de la liste des students créés.
         return $students;
     }
 
@@ -209,7 +283,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $studentIndex = 0;
         $projects = [];
 
-        // création du premier projet avec des données en dur
+        // création du premier project avec des données en dur
         $project = new Project();
         $project->setName('Hackathon');
 
@@ -227,9 +301,17 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($project);
+
+        // Ajout du premier project créé à la liste.
         $projects[] = $project;
 
-        // création des projets suivants avec des données aléatoires
+        // Création de projects avec des données aléatoires.
+        // On démarre la boucle for avec $i = 1 et non $i = 0
+        // car on a « déjà fait le premier tour » de la boucle
+        // quand on a créé notre premier project ci-dessus.
+        // Si le développeur demande N projects, il faut retrancher
+        // le project qui a été créé ci-dessus et en créer N-1
+        // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
             $project = new Project();
             $project->setName($this->faker->sentence(2));
@@ -249,9 +331,11 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($project);
 
+            // Ajout du project créé à la liste.
             $projects[] = $project;
         }
 
+        // Renvoi de la liste des projects créés.
         return $projects;
     }
 
@@ -266,6 +350,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // hashage du mot de passe
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
+        // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+        // est libre mais il vaut mieux suivre la convention
+        // proposée par Symfony.
         $user->setRoles(['ROLE_TEACHER']);
 
         // Demande d'enregistrement d'un objet dans la BDD
@@ -278,20 +365,25 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $teacher->setPhone('0612345678');
         // affectation du compte user au profil qu'on vient de créer
         $teacher->setUser($user);
-        // récupération du premier projet de la liste
-        // et suppression de ce projet de la liste
+        // récupération du premier project de la liste
+        // et suppression de ce project de la liste
         $firstProject = array_shift($projects);
-        // association du teacher et d'un projet constant
+        // association du teacher et d'un project constant
         $teacher->addProject($firstProject);
 
         // Demande d'enregistrement d'un objet dans la BDD
         $manager->persist($teacher);
 
-        // ajout du teacher créé au tableau
+        // Ajout du premier teacher créé à la liste.
         $teachers[] = $teacher;
 
-        // on démarre avec $i = 1 au lieu de $i = 0, car le premier
-        // teacher a déjà été créé avec des données constantes
+        // Création de teachers avec des données aléatoires.
+        // On démarre la boucle for avec $i = 1 et non $i = 0
+        // car on a « déjà fait le premier tour » de la boucle
+        // quand on a créé notre premier teacher ci-dessus.
+        // Si le développeur demande N teachers, il faut retrancher
+        // le teacher qui a été créé ci-dessus et en créer N-1
+        // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
             // création de comptes users avec des données aléatoires
             $user = new User();
@@ -299,6 +391,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // hashage du mot de passe
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
+            // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+            // est libre mais il vaut mieux suivre la convention
+            // proposée par Symfony.
             $user->setRoles(['ROLE_TEACHER']);
 
             // Demande d'enregistrement d'un objet dans la BDD
@@ -312,12 +407,12 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // affectation du compte user au profil qu'on vient de créer
             $teacher->setUser($user);
 
-            // on détermine aléatoirement le nombre de projets associés au teacher
+            // on détermine aléatoirement le nombre de projects associés au teacher
             $projectsCount = random_int(0, 10);
-            // on créé une liste aléatoire de projets
+            // on créé une liste aléatoire de projects
             $randomProjects = $this->faker->randomElements($projects, $projectsCount);
 
-            // association du teacher et des projets aléatoires
+            // association du teacher et des projects aléatoires
             foreach ($randomProjects as $randomProject) {
                 $teacher->addProject($randomProject);
             }
@@ -325,10 +420,11 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Demande d'enregistrement d'un objet dans la BDD
             $manager->persist($teacher);
 
-            // ajout du teacher créé au tableau
+            // Ajout du teacher créé à la liste.
             $teachers[] = $teacher;    
         }
 
+        // Renvoi de la liste des teachers créés.
         return $teachers;
     }
 }
