@@ -21,6 +21,8 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
     public function __construct(UserPasswordEncoderInterface $encoder)
     {
         $this->encoder = $encoder;
+        // Création d'une instance de faker localisée en
+        // français (fr) de France (FR).
         $this->faker = FakerFactory::create('fr_FR');
     }
 
@@ -49,15 +51,15 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // students et du nombre de students par project.
         if ($studentsCount % $studentsPerProject == 0) {
             // Il y a suffisamment de projects pour chaque student.
-            // C-à-d que le reste de la division euclidienne (le
-            // modulo) est nulle.
+            // C-à-d que le reste de la division euclidienne (le modulo)
+            // est nulle.
             // La division renvoit un float, c'est pourquoi il est nécessaire
             // de type caster la valeur de la division en (int).
             $projectsCount = (int) ($studentsCount / $studentsPerProject);
         } else {
             // Il n'y a pas suffisamment de projects pour chaque student.
-            // C-à-d que le reste de la division euclidienne (le
-            // modulo) n'est pas nulle.
+            // C-à-d que le reste de la division euclidienne (le modulo)
+            // n'est pas nulle.
             // On rajoute un project supplémentaire.
             // La division renvoit un float, c'est pourquoi il est nécessaire
             // de type caster la valeur de la division en (int).
@@ -85,11 +87,11 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function loadAdmins(ObjectManager $manager, int $count)
     {
-        // Création d'un nouveau user avec des données constantes.
+        // Création d'un nouveau user.
         // Ici il s'agit d'un compte admin.
         $user = new User();
         $user->setEmail('admin@example.com');
-        // Hashage du mot de passe.
+        // Hachage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
         // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
@@ -97,7 +99,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // proposée par Symfony.
         $user->setRoles(['ROLE_ADMIN']);
 
-        // Demande d'enregistrement d'un objet dans la BDD
+        // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($user);
 
         // Création de users avec des données aléatoires.
@@ -111,7 +113,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Création d'un nouveau user.
             $user = new User();
             $user->setEmail($this->faker->email());
-            // Hashage du mot de passe.
+            // Hachage du mot de passe.
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
             // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
@@ -119,7 +121,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // proposée par Symfony.
             $user->setRoles(['ROLE_ADMIN']);
 
-            // Demande d'enregistrement d'un objet dans la BDD
+            // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($user);
         }
     }
@@ -131,7 +133,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // de création d'objets puissent les utiliser.
         $schoolYears = [];
 
-        // Création d'une school year avec des données constantes.
+        // Création d'une nouvelle school year.
         $schoolYear = new SchoolYear();
         $schoolYear->setName('Lorem ipsum');
         // La fonction \DateTime::createFromFormat() permet de créer un objet
@@ -152,7 +154,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $endDate->add(new \DateInterval('P4M'));
         $schoolYear->setEndDate($endDate);
 
-        // Demande d'enregistrement d'un objet dans la BDD
+        // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($schoolYear);
 
         // Ajout de la première school year créée à la liste.
@@ -169,6 +171,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Création d'une nouvelle school year.
             $schoolYear = new SchoolYear();
             $schoolYear->setName($this->faker->name());
+            // Affectation d'une date aléatoire entre maintenant et il y a 10 ans.
             $schoolYear->setStartDate($this->faker->dateTimeThisDecade());
             // Récupération de la date de début.
             $startDate = $schoolYear->getStartDate();
@@ -178,7 +181,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $endDate->add(new \DateInterval('P4M'));
             $schoolYear->setEndDate($endDate);
 
-            // Demande d'enregistrement d'un objet dans la BDD
+            // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($schoolYear);
 
             // Ajout de la school year créée à la liste.
@@ -202,13 +205,13 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // utiliser la première school year.
         $schoolYearIndex = 0;
 
-        // Récupération de la première school year.
+        // Récupération d'une school year précisée par l'index $schoolYearIndex.
         $schoolYear = $schoolYears[$schoolYearIndex];
 
         // Création d'un nouveau user.
         $user = new User();
         $user->setEmail('student@example.com');
-        // Hashage du mot de passe.
+        // Hachage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
         // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
@@ -216,7 +219,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // proposée par Symfony.
         $user->setRoles(['ROLE_STUDENT']);
 
-        // Demande d'enregistrement d'un objet dans la BDD
+        // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($user);
 
         // Création d'un nouveau student.
@@ -224,8 +227,9 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         $student->setFirstname('Student');
         $student->setLastname('Student');
         $student->setPhone('0612345678');
+        // Association d'un student et d'une school year
         $student->setSchoolYear($schoolYear);
-        // Association du compte user et du profil student.
+        // Association d'un student et d'un user.
         $student->setUser($user);
 
         // Demande d'enregistrement d'un objet dans la BDD
@@ -242,8 +246,12 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // le student qui a été créé ci-dessus et en créer N-1
         // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
+            // Récupération d'une school year précisée par l'index $schoolYearIndex.
             $schoolYear = $schoolYears[$schoolYearIndex];
 
+            // Si le nombre de student par school year pour la school year
+            // en cours a été atteint, on incrémente l'index des school years
+            // pour que la school year suivante soit utilisée au prochain tour. 
             if ($i % $studentsPerSchoolYear == 0) {
                 $schoolYearIndex++;
             }
@@ -251,7 +259,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // Création d'un nouveau user.
             $user = new User();
             $user->setEmail($this->faker->email());
-            // Hashage du mot de passe.
+            // Hachage du mot de passe.
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
             // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
@@ -269,10 +277,10 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $student->setPhone($this->faker->phoneNumber());
             // Association d'un student et d'une school year.
             $student->setSchoolYear($schoolYear);
-            // Association du compte user et du profil student.
+            // Association d'un student et d'un user.
             $student->setUser($user);
 
-            // Demande d'enregistrement d'un objet dans la BDD
+            // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($student);
 
             // Ajout du student créé à la liste.
@@ -285,26 +293,40 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function loadProjects(ObjectManager $manager, array $students, int $studentsPerProject, int $count)
     {
-        $studentIndex = 0;
+        // Création d'un tableau qui contiendra les projects qu'on va créer.
+        // La fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
+        // de création d'objets puissent les utiliser.
         $projects = [];
 
-        // création du premier project avec des données en dur
+        // Création d'un compteur qui contient l'index du student en cours
+        // dans le tableau des students.
+        // Assez logiquement, le premier index est 0 car on commence par
+        // utiliser le premier student.
+        $studentIndex = 0;
+
+        // Création d'un nouveau project.
         $project = new Project();
         $project->setName('Hackathon');
 
+        // Association d'un project et de plusieurs students.
         while (true) {
+            // Récupération d'un student précisé par l'index $studentIndex.
             $student = $students[$studentIndex];
+            // Association d'un project et d'un student.
             $project->addStudent($student);
-            
+
+            // Incrémentation de l'index des students.
+            // Au prochain tour, c'est le student suivant qui sera utilisé.
+            $studentIndex++;
+
+            // Si le nombre de student par project pour le project
+            // en cours a été atteint, on sort de la boucle. 
             if (($studentIndex + 1) % $studentsPerProject == 0) {
-                $studentIndex++;
                 break;
             }
-
-            $studentIndex++;
         }
 
-        // Demande d'enregistrement d'un objet dans la BDD
+        // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($project);
 
         // Ajout du premier project créé à la liste.
@@ -318,22 +340,30 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // le project qui a été créé ci-dessus et en créer N-1
         // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
+            // Création d'un nouveau project.
             $project = new Project();
+            // Affectation d'une phrase aléatoire d'environ 2 mots.
             $project->setName($this->faker->sentence(2));
 
+            // Association d'un project et de plusieurs students.
             while (true) {
+                // Récupération d'un student précisé par l'index $studentIndex.
                 $student = $students[$studentIndex];
+                // Association d'un project et d'un student.
                 $project->addStudent($student);
-        
+
+                // Incrémentation de l'index des students.
+                // Au prochain tour, c'est le student suivant qui sera utilisé.
+                $studentIndex++;
+
+                // Si le nombre de student par project pour le project
+                // en cours a été atteint, on sort de la boucle. 
                 if (($studentIndex + 1) % $studentsPerProject == 0) {
-                    $studentIndex++;
                     break;
                 }
-
-                $studentIndex++;
             }
         
-            // Demande d'enregistrement d'un objet dans la BDD
+            // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($project);
 
             // Ajout du project créé à la liste.
@@ -346,13 +376,15 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
     public function loadTeachers(ObjectManager $manager, array $projects, int $count)
     {
-        // création d'un tableau vide qui va nous permettre de stocker les teachers
+        // Création d'un tableau qui contiendra les teachers qu'on va créer.
+        // La fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
+        // de création d'objets puissent les utiliser.
         $teachers = [];
 
-        // création du compte user avec des données constantes
+        // Création d'un nouveau user.
         $user = new User();
         $user->setEmail('teacher@example.com');
-        // hashage du mot de passe
+        // Hachage du mot de passe.
         $password = $this->encoder->encodePassword($user, '123');
         $user->setPassword($password);
         // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
@@ -360,23 +392,24 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // proposée par Symfony.
         $user->setRoles(['ROLE_TEACHER']);
 
-        // Demande d'enregistrement d'un objet dans la BDD
+        // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($user);
 
-        // création du profil teacher avec des données constantes
+        // Création d'un nouveau teacher.
         $teacher = new Teacher();
         $teacher->setFirstname('Teacher');
         $teacher->setLastname('Teacher');
         $teacher->setPhone('0612345678');
-        // affectation du compte user au profil qu'on vient de créer
+        // Association d'un teacher et d'un user.
         $teacher->setUser($user);
-        // récupération du premier project de la liste
-        // et suppression de ce project de la liste
+
+        // Récupération du premier project de la liste
+        // et suppression de ce project de la liste.
         $firstProject = array_shift($projects);
-        // association du teacher et d'un project constant
+        // Association d'un teacher et d'un project.
         $teacher->addProject($firstProject);
 
-        // Demande d'enregistrement d'un objet dans la BDD
+        // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($teacher);
 
         // Ajout du premier teacher créé à la liste.
@@ -390,10 +423,10 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         // le teacher qui a été créé ci-dessus et en créer N-1
         // dans la boucle for.
         for ($i = 1; $i < $count; $i++) {
-            // création de comptes users avec des données aléatoires
+            // Création d'un nouveau user.
             $user = new User();
             $user->setEmail($this->faker->email());
-            // hashage du mot de passe
+            // Hachage du mot de passe.
             $password = $this->encoder->encodePassword($user, '123');
             $user->setPassword($password);
             // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
@@ -401,28 +434,31 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             // proposée par Symfony.
             $user->setRoles(['ROLE_TEACHER']);
 
-            // Demande d'enregistrement d'un objet dans la BDD
+            // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($user);
 
-            // création de profils teacher avec des données aléatoires
+            // Création d'un nouveau teacher.
             $teacher = new Teacher();
             $teacher->setFirstname($this->faker->firstname());
             $teacher->setLastname($this->faker->lastname());
             $teacher->setPhone($this->faker->phoneNumber());
-            // affectation du compte user au profil qu'on vient de créer
+            // Association d'un teacher et d'un user.
             $teacher->setUser($user);
 
-            // on détermine aléatoirement le nombre de projects associés au teacher
+            // Génération aléatoire du nombre de projects associés au teacher.
             $projectsCount = random_int(0, 10);
-            // on créé une liste aléatoire de projects
+            // Création d'une liste aléatoire de projects.
+            // Cette liste contient exactement le nombre de projects
+            // précisé par $projectsCount.
             $randomProjects = $this->faker->randomElements($projects, $projectsCount);
 
-            // association du teacher et des projects aléatoires
+            // Association d'un teacher et de plusieurs projects.
             foreach ($randomProjects as $randomProject) {
+                // Association d'un teacher et d'un project.
                 $teacher->addProject($randomProject);
             }
 
-            // Demande d'enregistrement d'un objet dans la BDD
+            // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($teacher);
 
             // Ajout du teacher créé à la liste.
