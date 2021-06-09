@@ -24,6 +24,14 @@ class TestController extends AbstractController
         // Récupération de l'entity manager.
         $entityManager = $this->getDoctrine()->getManager();
 
+        // La chaîne de caractères qu'on veut rechercher dans le prénom
+        // ou le nom de famille des students.
+        $name = 'remy';
+        // Le repository renvoit tous les students qui contiennent la
+        // chaîne de caractères recherchée dans le prénom ou le nom de famille.
+        $students = $studentRepository->findByFirstnameOrLastname($name);
+        dump($students);
+
         // Récupération de la liste complète des admins.
         $admins = $userRepository->findAllAdmins();
         // Récupération du dernier admin de la liste.
