@@ -267,7 +267,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $student->setFirstname($this->faker->firstname());
             $student->setLastname($this->faker->lastname());
             $student->setPhone($this->faker->phoneNumber());
-            // Association d'un student et d'une school year. 
+            // Association d'un student et d'une school year.
             $student->setSchoolYear($schoolYear);
             // Association du compte user et du profil student.
             $student->setUser($user);
