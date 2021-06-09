@@ -163,7 +163,7 @@ Relations :
 
 - aucune
 
-## Dépendances
+## Arbre de dépendance des entités
 
 - Client
   - User
