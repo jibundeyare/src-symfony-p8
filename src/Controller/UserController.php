@@ -70,12 +70,25 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, User $user): Response
+    public function edit(Request $request, User $user, UserPasswordEncoderInterface $passwordEncoder): Response
     {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérification de la présence d'un mot de passe
+            // On ne met à jour le mot de passe que si l'utilisateur
+            // en a fourni un.
+            if ($form->get('plainPassword')->getData()) {
+                // Hashage du mot de passe
+                $user->setPassword(
+                    $passwordEncoder->encodePassword(
+                        $user,
+                        $form->get('plainPassword')->getData()
+                    )
+                );
+            }
+
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('user_index');
