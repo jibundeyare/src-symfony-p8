@@ -116,7 +116,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/password")
+     * @Route("/{id}/password", name="user_password", methods={"GET", "POST"})
      */
     public function password(Request $request, User $user, UserPasswordEncoderInterface $passwordEncoder): Response
     {
@@ -137,7 +137,7 @@ class UserController extends AbstractController
             return $this->redirectToRoute('user_index');
         }
 
-        return $this->render('user/edit.html.twig', [
+        return $this->render('user/password.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
         ]);
