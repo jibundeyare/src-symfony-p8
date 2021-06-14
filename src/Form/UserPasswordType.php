@@ -4,30 +4,17 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 
-class UserType extends AbstractType
+class UserPasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email')
-            ->add('roles', ChoiceType::class, [
-                'choices'  => [
-                    'admin' => 'ROLE_ADMIN',
-                    'student' => 'ROLE_STUDENT',
-                    'teacher' => 'ROLE_TEACHER',
-                    'client' => 'ROLE_CLIENT',
-                ],
-                'multiple' => true,
-                'expanded' => true,
-            ])
-            // Ajout d'un champ nommé plainPassword dans le formulaire.
             ->add('plainPassword', RepeatedType::class, [
                 // Le champ plainPassword ne correspond à aucun attribut de
                 // l'entité User. C'est pourquoi il ne doit pas être affecté
@@ -40,7 +27,7 @@ class UserType extends AbstractType
                     'class' => 'password-field',
                     'autocomplete' => 'new-password'
                 ]],
-                'required' => false,
+                'required' => true,
                 'first_options'  => ['label' => 'Password'],
                 'second_options' => ['label' => 'Repeat Password'],
                 'constraints' => [
