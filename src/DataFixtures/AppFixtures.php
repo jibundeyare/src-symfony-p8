@@ -207,7 +207,7 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
 
         // Récupération d'une school year précisée par l'index $schoolYearIndex.
         $schoolYear = $schoolYears[$schoolYearIndex];
-
+        
         // Création d'un nouveau user.
         $user = new User();
         $user->setEmail('student@example.com');
