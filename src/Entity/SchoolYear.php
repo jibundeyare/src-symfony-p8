@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class SchoolYear
 {
+    const DEFAULT_INTERVAL = 'P4M';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -51,6 +53,17 @@ class SchoolYear
 
     public function __construct()
     {
+        // Date de début de la formation à la date du jour.
+        $this->startDate = new \DateTime();
+
+        // Copie de la date de début dans la date de fin.
+        $this->endDate = \DateTime::createFromFormat(
+            'Y-m-d H:i:s',
+            $this->startDate->format('Y-m-d H:i:s')
+        );
+        // Ajout d'un interval de 4 mois à la date de fin.
+        $this->endDate->add(new \DateInterval(self::DEFAULT_INTERVAL));
+
         $this->students = new ArrayCollection();
         $this->teachers = new ArrayCollection();
     }
