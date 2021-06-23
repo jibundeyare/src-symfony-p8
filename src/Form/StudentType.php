@@ -7,6 +7,7 @@ use App\Entity\SchoolYear;
 use App\Entity\Student;
 use App\Entity\Tag;
 use App\Entity\User;
+use App\Form\UserType;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -18,6 +19,11 @@ class StudentType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('user', UserType::class, [
+                'label_attr' => [
+                    'class' => 'd-none',
+                ],
+            ])
             ->add('firstname')
             ->add('lastname')
             ->add('phone')
@@ -83,13 +89,6 @@ class StudentType extends AbstractType
                 // used to render a select box, check boxes or radios
                 'multiple' => true,
                 'expanded' => true,
-            ])
-            ->add('user', EntityType::class, [
-                // looks for choices from this entity
-                'class' => User::class,
-            
-                // uses the User.username property as the visible option string
-                'choice_label' => 'username',
             ])
         ;
     }

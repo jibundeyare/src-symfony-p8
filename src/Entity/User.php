@@ -9,11 +9,12 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  * @Gedmo\SoftDeleteable(fieldName="deletedAt", timeAware=false, hardDelete=false)
- * @UniqueEntity(fields={"email"}, message="There is already an account with this email")
+ * @UniqueEntity(fields={"email"})
  */
 class User implements UserInterface
 {
@@ -56,12 +57,23 @@ class User implements UserInterface
     private $id;
 
     /**
+     * @Assert\NotBlank
+     * @Assert\Email
+     * @Assert\Length(
+     *   min = 6,
+     *   max = 180
+     * )
      * @ORM\Column(type="string", length=180, unique=true)
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
+     * @Assert\Choice(
+     *   {"ROLE_ADMIN", "ROLE_USER", "ROLE_STUDENT", "ROLE_TEACHER", "ROLE_CLIENT"},
+     *   multiple=true,
+     *   multipleMessage="Seules les valeurs suivantes sont valides."
+     * )
      */
     private $roles = [];
 
