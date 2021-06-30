@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/student")
@@ -119,6 +120,10 @@ class StudentController extends AbstractController
      */
     public function delete(Request $request, Student $student): Response
     {
+        if ($this->isGranted('ROLE_STUDENT')) {
+            throw new AccessDeniedException();
+        }
+
         if ($this->isCsrfTokenValid('delete'.$student->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($student);
