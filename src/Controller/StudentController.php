@@ -66,8 +66,25 @@ class StudentController extends AbstractController
     /**
      * @Route("/{id}", name="student_show", methods={"GET"})
      */
-    public function show(Student $student): Response
+    public function show(StudentRepository $studentRepository, Student $student): Response
     {
+        // Récupération du compte de l'utilisateur qui est connecté
+        $user = $this->getUser();
+
+        // On vérifie si l'utilisateur est un student 
+        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            // Récupèration du profil student
+            $userStudent = $studentRepository->findOneByUser($user);
+
+            // Comparaison du profil demandé par l'utilisateur et le profil de l'utilisateur
+            // Si les deux sont différents, on redirige l'utilisateur vers la page de son profil
+            if ($student->getId() != $userStudent->getId()) {
+                return $this->redirectToRoute('student_show', [
+                    'id' => $userStudent->getId(),
+                ]);
+            }
+        }
+
         return $this->render('student/show.html.twig', [
             'student' => $student,
         ]);
