@@ -97,6 +97,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
 
         $user = $token->getUser();
 
+        // @todo fournir le vrai id du student
         $studentId = 123;
 
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
