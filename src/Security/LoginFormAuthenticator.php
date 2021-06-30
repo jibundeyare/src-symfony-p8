@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Repository\StudentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,13 +31,20 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
     private $urlGenerator;
     private $csrfTokenManager;
     private $passwordEncoder;
+    private $studentRepository;
 
-    public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        UrlGeneratorInterface $urlGenerator,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        UserPasswordEncoderInterface $passwordEncoder,
+        StudentRepository $studentRepository
+    ) {
         $this->entityManager = $entityManager;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
+        $this->studentRepository = $studentRepository;
     }
 
     public function supports(Request $request)
@@ -97,16 +105,19 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements P
 
         $user = $token->getUser();
 
-        // @todo fournir le vrai id du student
-        $studentId = 123;
-
         if (in_array('ROLE_ADMIN', $user->getRoles())) {
             $url = $this->urlGenerator->generate('student_index');
         } elseif (in_array('ROLE_TEACHER', $user->getRoles())) {
             $url = $this->urlGenerator->generate('project_index');
         } elseif (in_array('ROLE_STUDENT', $user->getRoles())) {
+            $student = $this->studentRepository->findOneByUser($user);
+
+            if (!$student) {
+                throw new \Exception("Cet utilisateur n'est rattaché à aucun profil : {$user->getId()} {$user->getEmail()}");
+            }
+
             $url = $this->urlGenerator->generate('student_show', [
-                'id' => $studentId,
+                'id' => $student->getId(),
             ]);
         } elseif (in_array('ROLE_CLIENT', $user->getRoles())) {
             $url = $this->urlGenerator->generate('project_index');
