@@ -29,3 +29,8 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+        # Tous les chemins commençant par "/student/id/edit" ne sont accessibles qu'aux roles admin ou student
+        # La partie "id" du chemin doit être une suite chiffres
+        - { path: "^/student/[0-9]+/edit", roles: [ROLE_ADMIN, ROLE_STUDENT] }
+        # Tous les chemins commençant par "/student" ne sont accessibles qu'aux roles admin
+        - { path: ^/student, roles: ROLE_ADMIN }
