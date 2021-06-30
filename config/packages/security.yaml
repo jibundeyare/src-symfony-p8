@@ -41,9 +41,15 @@ security:
         # La partie "id" du chemin doit être une suite chiffres
         - { path: "^/student/[0-9]+/edit", roles: [ROLE_ADMIN, ROLE_STUDENT] }
 
-        # Tous les chemins commençant par "/student/id/show" ne sont accessibles qu'aux roles admin ou student
+        # Tous les chemins demandés avec la méthode GET commençant par "/student/id/show" ne sont
+        # accessibles qu'aux role student.
         # La partie "id" du chemin doit être une suite chiffres
-        - { path: "^/student/[0-9]+/?$", roles: [ROLE_ADMIN, ROLE_STUDENT] }
+        - { path: "^/student/[0-9]+/?$", roles: [ROLE_STUDENT], methods: [GET] }
+
+        # Tous les chemins demandés commençant par "/student/id/show" ne sont
+        # accessibles qu'aux roles admin ou student.
+        # Toutes les méthodes sont autorisées. 
+        - { path: "^/student/[0-9]+/?$", roles: [ROLE_ADMIN] }
 
         # Tous les chemins commençant par "/student" ne sont accessibles qu'aux roles admin
         - { path: ^/student, roles: ROLE_ADMIN }

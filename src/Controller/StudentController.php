@@ -66,23 +66,12 @@ class StudentController extends AbstractController
     /**
      * @Route("/{id}", name="student_show", methods={"GET"})
      */
-    public function show(StudentRepository $studentRepository, Student $student): Response
+    public function show(Student $student, StudentRepository $studentRepository): Response
     {
-        // Récupération du compte de l'utilisateur qui est connecté
-        $user = $this->getUser();
+        $response = $this->redirectStudent('student_show', $student, $studentRepository);
 
-        // On vérifie si l'utilisateur est un student 
-        if (in_array('ROLE_STUDENT', $user->getRoles())) {
-            // Récupèration du profil student
-            $userStudent = $studentRepository->findOneByUser($user);
-
-            // Comparaison du profil demandé par l'utilisateur et le profil de l'utilisateur
-            // Si les deux sont différents, on redirige l'utilisateur vers la page de son profil
-            if ($student->getId() != $userStudent->getId()) {
-                return $this->redirectToRoute('student_show', [
-                    'id' => $userStudent->getId(),
-                ]);
-            }
+        if ($response) {
+            return $response;
         }
 
         return $this->render('student/show.html.twig', [
@@ -93,8 +82,14 @@ class StudentController extends AbstractController
     /**
      * @Route("/{id}/edit", name="student_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Student $student, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function edit(Request $request, Student $student, StudentRepository $studentRepository, UserPasswordEncoderInterface $passwordEncoder): Response
     {
+        $response = $this->redirectStudent('student_edit', $student, $studentRepository);
+
+        if ($response) {
+            return $response;
+        }
+
         $form = $this->createForm(StudentType::class, $student);
         $form->handleRequest($request);
 
@@ -131,5 +126,28 @@ class StudentController extends AbstractController
         }
 
         return $this->redirectToRoute('student_index');
+    }
+
+    private function redirectStudent(string $route, Student $student, StudentRepository $studentRepository)
+    {
+        // Récupération du compte de l'utilisateur qui est connecté
+        $user = $this->getUser();
+
+        // On vérifie si l'utilisateur est un student 
+        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            // Récupèration du profil student
+            $userStudent = $studentRepository->findOneByUser($user);
+
+            // Comparaison du profil demandé par l'utilisateur et le profil de l'utilisateur
+            // Si les deux sont différents, on redirige l'utilisateur vers la page de son profil
+            if ($student->getId() != $userStudent->getId()) {
+                return $this->redirectToRoute($route, [
+                    'id' => $userStudent->getId(),
+                ]);
+            }
+        }
+
+        // Si aucune redirection n'est nécessaire, on renvoit une valeur nulle
+        return null;
     }
 }
