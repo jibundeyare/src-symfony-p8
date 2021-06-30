@@ -22,7 +22,7 @@ class StudentType extends AbstractType
             ->add('user', UserType::class, [
                 'label_attr' => [
                     'class' => 'd-none',
-                ],
+                ]
             ])
             ->add('firstname')
             ->add('lastname')

@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\SchoolYear;
+use App\Entity\Student;
 use App\Entity\Teacher;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -20,6 +21,17 @@ class SchoolYearType extends AbstractType
             ->add('endDate')
             ->add('teachers', EntityType::class, [
                 'class' => Teacher::class,
+                // La fonction anonyme doit renvoyer une chaîne de caractères
+                // qui contient le texte qui sera utilisé dans le menu déroulant. 
+                'choice_label' => function(Teacher $teacher) {
+                    // On renvoit les attributs firstname et lastname.
+                    return "{$teacher->getFirstname()} {$teacher->getLastname()}";
+                },
+                'multiple' => true,
+                'expanded' => true,
+            ])
+            ->add('students', EntityType::class, [
+                'class' => Student::class,
                 // La fonction anonyme doit renvoyer une chaîne de caractères
                 // qui contient le texte qui sera utilisé dans le menu déroulant. 
                 'choice_label' => function(Teacher $teacher) {

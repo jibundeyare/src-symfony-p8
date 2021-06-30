@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Form\RegistrationFormType;
+use App\Entity\Student;
+use App\Form\StudentRegistrationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,25 +17,30 @@ class RegistrationController extends AbstractController
      */
     public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
     {
-        $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
+        $student = new Student();
+        $form = $this->createForm(StudentRegistrationType::class, $student);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // encode the plain password
+            $user = $student->getUser();
             $user->setPassword(
                 $passwordEncoder->encodePassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $form->get('user')->get('plainPassword')->getData()
                 )
             );
 
+            $user->setRoles(['ROLE_STUDENT']);
+
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
+            $entityManager->persist($student);
             $entityManager->flush();
             // do anything else you need here, like send an email
 
-            return $this->redirectToRoute('test');
+            return $this->redirectToRoute('student_show', [
+                'id' => $student->getId(),
+            ]);
         }
 
         return $this->render('registration/register.html.twig', [
