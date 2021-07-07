@@ -34,9 +34,9 @@ class SchoolYearType extends AbstractType
                 'class' => Student::class,
                 // La fonction anonyme doit renvoyer une chaîne de caractères
                 // qui contient le texte qui sera utilisé dans le menu déroulant. 
-                'choice_label' => function(Teacher $teacher) {
+                'choice_label' => function(Student $student) {
                     // On renvoit les attributs firstname et lastname.
-                    return "{$teacher->getFirstname()} {$teacher->getLastname()}";
+                    return "{$student->getFirstname()} {$student->getLastname()}";
                 },
                 'multiple' => true,
                 'expanded' => true,
