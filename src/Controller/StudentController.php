@@ -150,7 +150,7 @@ class StudentController extends AbstractController
 
         // On vérifie si l'utilisateur est un student
         if (in_array('ROLE_STUDENT', $user->getRoles())) {
-             // Récupèration du profil student
+            // Récupèration du profil student
             $userStudent = $studentRepository->findOneByUser($user);
 
             // Comparaison du profil demandé par l'utilisateur et le profil de l'utilisateur
