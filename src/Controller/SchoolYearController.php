@@ -9,6 +9,7 @@ use App\Repository\StudentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -80,8 +81,18 @@ class SchoolYearController extends AbstractController
     /**
      * @Route("/{id}", name="school_year_show", methods={"GET"})
      */
-    public function show(SchoolYear $schoolYear): Response
+    public function show(SchoolYear $schoolYear, StudentRepository $studentRepository): Response
     {
+        $user = $this->getUser();
+
+        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            $student = $studentRepository->findOneByUser($user);
+
+            if ($student->getSchoolYear() != $schoolYear) {
+                throw new NotFoundHttpException();
+            }
+        }
+
         return $this->render('school_year/show.html.twig', [
             'school_year' => $schoolYear,
         ]);
