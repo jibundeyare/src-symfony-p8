@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\SchoolYear;
 use App\Form\SchoolYearType;
 use App\Repository\SchoolYearRepository;
-use App\Repository\StudentRespository;
+use App\Repository\StudentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ class SchoolYearController extends AbstractController
     /**
      * @Route("/", name="school_year_index", methods={"GET"})
      */
-    public function index(SchoolYearRepository $schoolYearRepository, StudentRespository $studentRespository): Response
+    public function index(SchoolYearRepository $schoolYearRepository, StudentRepository $studentRepository): Response
     {
         // Par défaut, les utilisateurs voient toutes les school years.
         // Mais les students ne sont pas censés voir les autres school
@@ -36,7 +36,7 @@ class SchoolYearController extends AbstractController
             // L'utilisateur est un student
 
             // On récupère le profil student lié au compte utilisateur
-            $student = $studentRespository->findOneByUser($studentRespository);
+            $student = $studentRepository->findOneByUser($user);
 
             // On récupère la school year de l'utilisater 
             $schoolYear = $student->getSchoolYear();

@@ -23,6 +23,29 @@
                 <th>Phone</th>
                 <td>{{ student.phone }}</td>
             </tr>
+            <tr>
+                <th>School Year</th>
+                <td>{{ student.schoolYear.name }} ({{ student.schoolYear.id }})</td>
+            </tr>
+            <tr>
+                <th>Projects</th>
+                <td>
+                    <p>
+                        {% if student.projects %}
+                        <ul>
+                            {% for project in student.projects %}
+                            <li>{{ project.name }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </p>
+                    <p>
+                        {% for project in student.projects %}
+                            {{ project.name }}{% if not loop.last%},{% endif %}
+                        {% endfor %}
+                    </p>
+                </td>
+            </tr>
         </tbody>
     </table>
 
