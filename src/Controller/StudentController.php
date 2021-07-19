@@ -149,6 +149,8 @@ class StudentController extends AbstractController
         $user = $this->getUser();
 
         // On vérifie si l'utilisateur est un student
+        // Note : on peut aussi utiliser $this->isGranted('ROLE_STUDENT') au
+        // lieu de in_array('ROLE_STUDENT', $user->getRoles()).
         if (in_array('ROLE_STUDENT', $user->getRoles())) {
             // Récupèration du profil student
             $userStudent = $studentRepository->findOneByUser($user);

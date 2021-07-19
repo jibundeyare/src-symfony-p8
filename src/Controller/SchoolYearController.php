@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\SchoolYear;
 use App\Form\SchoolYearType;
 use App\Repository\SchoolYearRepository;
+use App\Repository\StudentRespository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,10 +19,36 @@ class SchoolYearController extends AbstractController
     /**
      * @Route("/", name="school_year_index", methods={"GET"})
      */
-    public function index(SchoolYearRepository $schoolYearRepository): Response
+    public function index(SchoolYearRepository $schoolYearRepository, StudentRespository $studentRespository): Response
     {
+        // Par défaut, les utilisateurs voient toutes les school years.
+        // Mais les students ne sont pas censés voir les autres school
+        // years que la leur.
+        $schoolYears = $schoolYearRepository->findAll();
+
+        // On récupère le compte de l'utilisateur authentifié
+        $user = $this->getUser();
+
+        // On vérifie si l'utilisateur est un student
+        // Note : on peut aussi utiliser $this->isGranted('ROLE_STUDENT') au
+        // lieu de in_array('ROLE_STUDENT', $user->getRoles()).
+        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            // L'utilisateur est un student
+
+            // On récupère le profil student lié au compte utilisateur
+            $student = $studentRespository->findOneByUser($studentRespository);
+
+            // On récupère la school year de l'utilisater 
+            $schoolYear = $student->getSchoolYear();
+            // On créé un tableau avec la school year de l'utilisateur.
+            // On est obligé de créer un tableau dans la variable $schoolYears
+            // car le template s'attend à ce qu'il puisse boucler sur la
+            // variable school_years.
+            $schoolYears = [$schoolYear];
+        }
+
         return $this->render('school_year/index.html.twig', [
-            'school_years' => $schoolYearRepository->findAll(),
+            'school_years' => $schoolYears,
         ]);
     }
 
