@@ -69,6 +69,11 @@ class StudentController extends AbstractController
      */
     public function show(Student $student, StudentRepository $studentRepository): Response
     {
+        // Un student n'a pas le droit de consulter le profil d'un autre student.  
+        // On vérifie si l'utilisateur est un student et si c'est le cas,
+        // on vérifie s'il demande le même profile que son profile student.
+        // S'il demande le profile d'un autre utilisateur on le redirige vers
+        // son propre profile.
         $response = $this->redirectStudent('student_show', $student, $studentRepository);
 
         if ($response) {
@@ -85,6 +90,11 @@ class StudentController extends AbstractController
      */
     public function edit(Request $request, Student $student, StudentRepository $studentRepository, UserPasswordEncoderInterface $passwordEncoder): Response
     {
+        // Un student n'a pas le droit de modifier le profil d'un autre student.  
+        // On vérifie si l'utilisateur est un student et si c'est le cas,
+        // on vérifie s'il demande le même profile que son profile student.
+        // S'il demande le profile d'un autre utilisateur on le redirige vers
+        // son propre profile.
         $response = $this->redirectStudent('student_edit', $student, $studentRepository);
 
         if ($response) {
@@ -138,9 +148,9 @@ class StudentController extends AbstractController
         // Récupération du compte de l'utilisateur qui est connecté
         $user = $this->getUser();
 
-        // On vérifie si l'utilisateur est un student 
+        // On vérifie si l'utilisateur est un student
         if (in_array('ROLE_STUDENT', $user->getRoles())) {
-            // Récupèration du profil student
+             // Récupèration du profil student
             $userStudent = $studentRepository->findOneByUser($user);
 
             // Comparaison du profil demandé par l'utilisateur et le profil de l'utilisateur
