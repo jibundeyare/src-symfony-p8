@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/school-year")
@@ -83,11 +84,21 @@ class SchoolYearController extends AbstractController
      */
     public function show(SchoolYear $schoolYear, StudentRepository $studentRepository): Response
     {
+        // On récupère le compte de l'utilisateur authentifié
         $user = $this->getUser();
 
+        // On vérifie si l'utilisateur est un student
+        // Note : on peut aussi utiliser $this->isGranted('ROLE_STUDENT') au
+        // lieu de in_array('ROLE_STUDENT', $user->getRoles()).
         if (in_array('ROLE_STUDENT', $user->getRoles())) {
+            // L'utilisateur est un student
+
+            // On récupère le profil student lié au compte utilisateur
             $student = $studentRepository->findOneByUser($user);
 
+            // On vérifie si la school year que l'utilisateur demande et la school year
+            // auquel il est rattaché correspondent.
+            // Si ce n'est pas le cas on lui renvoit un code 404
             if ($student->getSchoolYear() != $schoolYear) {
                 throw new NotFoundHttpException();
             }
@@ -125,6 +136,12 @@ class SchoolYearController extends AbstractController
      */
     public function delete(Request $request, SchoolYear $schoolYear): Response
     {
+        // Si' l'utilisateur est un student, on renvoie une exception car
+        // il n'a pas la droit d'effacer de données.
+        if ($this->isGranted('ROLE_STUDENT')) {
+            throw new AccessDeniedException();
+        }
+
         if ($this->isCsrfTokenValid('delete'.$schoolYear->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($schoolYear);

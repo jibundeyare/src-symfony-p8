@@ -26,6 +26,7 @@ class StudentController extends AbstractController
         // @todo template: ajouter l'affichage des emails
         // @todo form: sort school years in student type
         // @todo form: tri multiple ne fonctionne pas
+        // @todo filtrer : afficher les student de la même school year si le user est un student
 
         return $this->render('student/index.html.twig', [
             'students' => $studentRepository->findAll(),
@@ -130,6 +131,8 @@ class StudentController extends AbstractController
      */
     public function delete(Request $request, Student $student): Response
     {
+        // Si' l'utilisateur est un student, on renvoie une exception car
+        // il n'a pas la droit d'effacer de données.
         if ($this->isGranted('ROLE_STUDENT')) {
             throw new AccessDeniedException();
         }

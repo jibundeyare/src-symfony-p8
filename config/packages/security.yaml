@@ -46,3 +46,16 @@ security:
 
         # Tous les chemins commençant par "/student" ne sont accessibles qu'aux roles admin
         - { path: ^/student, roles: ROLE_ADMIN }
+
+        # Tous les chemins commençant par "/school-years/id/edit" ne sont accessibles qu'aux roles admin ou student
+        # La partie "id" du chemin doit être une suite chiffres
+        - { path: "^/school-year/[0-9]+/edit", roles: [ROLE_ADMIN] }
+
+        # Tous les chemins demandés commençant par "/school-years/id" ne sont accessibles qu'aux roles admin ou student.
+        - { path: "^/school-year/[0-9]+/?$", roles: [ROLE_ADMIN, ROLE_STUDENT] }
+
+        # Tous les chemins commençant par "/school-years/new" ne sont accessibles qu'aux roles admin
+        - { path: "^/school-year/new", roles: [ROLE_ADMIN] }
+
+        # Tous les chemins commençant par "/school-years" ne sont accessibles qu'aux roles admin
+        - { path: ^/school-year, roles: [ROLE_ADMIN, ROLE_STUDENT] }
