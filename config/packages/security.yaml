@@ -67,6 +67,8 @@ security:
 
         # Tous les chemins demandés commençant par "/school-years/id" ne sont accessibles qu'aux roles admin ou student.
         # Cette route correspond à la consultation ou la suppression d'une school year
+        # Pour bloquer l'accès à la suppression d'un student par un role student,
+        # on va implémenter la détection dans le contrôleur.
         - { path: "^/school-year/[0-9]+/?$", roles: [ROLE_ADMIN, ROLE_STUDENT] }
 
         # Tous les chemins commençant par "/school-years/new" ne sont accessibles qu'aux roles admin
