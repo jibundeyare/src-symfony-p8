@@ -28,14 +28,14 @@ class SchoolYearController extends AbstractController
         // years que la leur.
         $schoolYears = $schoolYearRepository->findAll();
 
-        // On récupère le compte de l'utilisateur authentifié
-        $user = $this->getUser();
-
         // On vérifie si l'utilisateur est un student
-        // Note : on peut aussi utiliser $this->isGranted('ROLE_STUDENT') au
-        // lieu de in_array('ROLE_STUDENT', $user->getRoles()).
-        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+        // Note : on peut aussi utiliser in_array('ROLE_STUDENT', $user->getRoles())
+        // au lieu de $this->isGranted('ROLE_STUDENT').
+        if ($this->isGranted('ROLE_STUDENT')) {
             // L'utilisateur est un student
+            
+            // On récupère le compte de l'utilisateur authentifié
+            $user = $this->getUser();
 
             // On récupère le profil student lié au compte utilisateur
             $student = $studentRepository->findOneByUser($user);
@@ -84,14 +84,14 @@ class SchoolYearController extends AbstractController
      */
     public function show(SchoolYear $schoolYear, StudentRepository $studentRepository): Response
     {
-        // On récupère le compte de l'utilisateur authentifié
-        $user = $this->getUser();
-
         // On vérifie si l'utilisateur est un student
-        // Note : on peut aussi utiliser $this->isGranted('ROLE_STUDENT') au
-        // lieu de in_array('ROLE_STUDENT', $user->getRoles()).
-        if (in_array('ROLE_STUDENT', $user->getRoles())) {
+        // Note : on peut aussi utiliser in_array('ROLE_STUDENT', $user->getRoles())
+        // au lieu de $this->isGranted('ROLE_STUDENT').
+        if ($this->isGranted('ROLE_STUDENT')) {
             // L'utilisateur est un student
+            
+            // On récupère le compte de l'utilisateur authentifié
+            $user = $this->getUser();
 
             // On récupère le profil student lié au compte utilisateur
             $student = $studentRepository->findOneByUser($user);
