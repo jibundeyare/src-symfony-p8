@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Student;
 use App\Entity\User;
 use App\Form\StudentType;
+use App\Form\SearchType;
 use App\Repository\StudentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +20,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class StudentController extends AbstractController
 {
     /**
-     * @Route("/", name="student_index", methods={"GET"})
+     * @Route("/", name="student_index", methods={"GET","POST"})
      */
-    public function index(StudentRepository $studentRepository): Response
+    public function index(Request $request, StudentRepository $studentRepository): Response
     {
         // @todo template: ajouter l'affichage des emails
         // @todo form: sort school years in student type
@@ -31,6 +32,11 @@ class StudentController extends AbstractController
         // Mais les students ne sont censés voir que les students
         // de la même school year qu'eux.
         $students = $studentRepository->findAll();
+
+        if ($request->request->all()) {
+            $search = $request->request->get('search');
+            $students = $studentRepository->findByFirstnameOrLastname($search);
+        }
 
         // On vérifie si l'utilisateur est un student
         // Note : on peut aussi utiliser in_array('ROLE_STUDENT', $user->getRoles())
