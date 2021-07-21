@@ -39,23 +39,40 @@ security:
 
         # Tous les chemins commençant par "/student/id/edit" ne sont accessibles qu'aux roles admin ou student
         # La partie "id" du chemin doit être une suite chiffres
+        # Cette route correspond à la modification d'un student
         - { path: "^/student/[0-9]+/edit", roles: [ROLE_ADMIN, ROLE_STUDENT] }
 
         # Tous les chemins demandés commençant par "/student/id" ne sont accessibles qu'aux roles admin ou student.
+        # Cette route correspond à la consultation ou la suppression d'un student
+        # Pour bloquer l'accès à la suppression d'un student par un role student,
+        # on va implémenter la détection dans le contrôleur.
         - { path: "^/student/[0-9]+/?$", roles: [ROLE_ADMIN, ROLE_STUDENT] }
 
-        # Tous les chemins commençant par "/student" ne sont accessibles qu'aux roles admin
-        - { path: ^/student, roles: ROLE_ADMIN }
+        # Tous les chemins commençant par "/school-years/new" ne sont accessibles qu'aux roles admin
+        # Cette route correspond à la création d'une school year
+        - { path: "^/school-year/new", roles: [ROLE_ADMIN] }
 
-        # Tous les chemins commençant par "/school-years/id/edit" ne sont accessibles qu'aux roles admin ou student
+        # Tous les chemins commençant par "/student" ne sont accessibles qu'aux roles admin ou student.
+        # Cette route correspond à la consultation de la liste des students
+        - { path: ^/student, roles: [ROLE_ADMIN, ROLE_STUDENT] }
+
+
+
+        # Tous les chemins commençant par "/school-years/id/edit" ne sont accessibles qu'au role admin
         # La partie "id" du chemin doit être une suite chiffres
+        # Cette route correspond à la modification d'une school year
+        # Pour bloquer l'accès à la suppression d'une school year par un role student,
+        # on va implémenter la détection dans le contrôleur.
         - { path: "^/school-year/[0-9]+/edit", roles: [ROLE_ADMIN] }
 
         # Tous les chemins demandés commençant par "/school-years/id" ne sont accessibles qu'aux roles admin ou student.
+        # Cette route correspond à la consultation ou la suppression d'une school year
         - { path: "^/school-year/[0-9]+/?$", roles: [ROLE_ADMIN, ROLE_STUDENT] }
 
         # Tous les chemins commençant par "/school-years/new" ne sont accessibles qu'aux roles admin
+        # Cette route correspond à la création d'une school year
         - { path: "^/school-year/new", roles: [ROLE_ADMIN] }
 
-        # Tous les chemins commençant par "/school-years" ne sont accessibles qu'aux roles admin
+        # Tous les chemins commençant par "/school-years" ne sont accessibles qu'aux roles admin ou student.
+        # Cette route correspond à la consultation de la liste des school years
         - { path: ^/school-year, roles: [ROLE_ADMIN, ROLE_STUDENT] }
