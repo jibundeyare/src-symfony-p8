@@ -48,9 +48,9 @@ security:
         # on va implémenter la détection dans le contrôleur.
         - { path: "^/student/[0-9]+/?$", roles: [ROLE_ADMIN, ROLE_STUDENT] }
 
-        # Tous les chemins commençant par "/school-years/new" ne sont accessibles qu'aux roles admin
+        # Tous les chemins commençant par "/student/new" ne sont accessibles qu'aux roles admin
         # Cette route correspond à la création d'une school year
-        - { path: "^/school-year/new", roles: [ROLE_ADMIN] }
+        - { path: "^/student/new", roles: [ROLE_ADMIN] }
 
         # Tous les chemins commençant par "/student" ne sont accessibles qu'aux roles admin ou student.
         # Cette route correspond à la consultation de la liste des students
