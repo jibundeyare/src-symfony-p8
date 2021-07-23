@@ -12,6 +12,7 @@
                 <th>Firstname</th>
                 <th>Lastname</th>
                 <th>Phone</th>
+                <th>Email</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -22,6 +23,7 @@
                 <td>{{ student.firstname }}</td>
                 <td>{{ student.lastname }}</td>
                 <td>{{ student.phone }}</td>
+                <td>{{ student.user.email }}</td>
                 <td>
                     <a href="{{ path('student_show', {'id': student.id}) }}">show</a>
                     <a href="{{ path('student_edit', {'id': student.id}) }}">edit</a>

@@ -24,10 +24,6 @@ class StudentController extends AbstractController
      */
     public function index(Request $request, StudentRepository $studentRepository, StudentSearchFormViewFactory $studentSearchFormViewFactory): Response
     {
-        // @todo template: ajouter l'affichage des emails
-        // @todo form: sort school years in student type
-        // @todo form: tri multiple ne fonctionne pas
-
         // Par défaut, les utilisateurs voient tous les students.
         // Mais les students ne sont censés voir que les students
         // de la même school year qu'eux.

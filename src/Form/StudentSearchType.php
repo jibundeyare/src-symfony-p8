@@ -40,7 +40,9 @@ class StudentSearchType extends AbstractType
                 // Contraintes de validation
                 'constraints' => [
                     new Length([
+                        // Longueur min
                         'min' => 3,
+                        // Longueur max
                         'max' => 255,
                     ])
                 ],
@@ -67,8 +69,8 @@ class StudentSearchType extends AbstractType
     // Normalement le préfixe devrait être "student_search" et le champ
     // keyword devraient avoir un attribut name du type "student_search[keyword]".
     // En choisissant un préfixe nulle, le name du champ devient simplement "keyword".
-    public function getBlockPrefix()
-    {
-        return null;
-    }
+    // public function getBlockPrefix()
+    // {
+    //     return null;
+    // }
 }
