@@ -24,18 +24,20 @@ class StudentSearchType extends AbstractType
             // Affectation de l'attribut action du formulaire.
             // Les données du formulaire sont envoyées vers la route "app_search".
             ->setAction($this->urlGenerator->generate('app_search'))
-            ->add('keyword', SearchType::class, [
+            // Sélection de la méthode GET pour l'envoie des données du formulaire.
+            // En général on préfère la méthode POST mais pour les formulaire de recherche
+            // la méthode GET est plus répandue.
+            ->setMethod('get')
+            ->add('q', SearchType::class, [
                 // Le champ n'est pas obligatoire
                 'required' => false,
+                // Masquage du label (le nom) du champ
+                'label' => false,
                 'attr' => [
                     // Sélection des classes CSS
                     'class' => 'form-control mr-sm-2',
                     // Affectation d'un placeholder 
                     'placeholder' => 'Search',
-                ],
-                // Masquage du label (le nom) du champ avec la classe bootstrap "d-none"
-                'label_attr' => [
-                    'class' => 'd-none',
                 ],
                 // Contraintes de validation
                 'constraints' => [

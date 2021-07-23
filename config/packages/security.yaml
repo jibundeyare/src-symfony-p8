@@ -78,3 +78,9 @@ security:
         # Tous les chemins commençant par "/school-years" ne sont accessibles qu'aux roles admin ou student.
         # Cette route correspond à la consultation de la liste des school years
         - { path: ^/school-year, roles: [ROLE_ADMIN, ROLE_STUDENT] }
+
+
+
+        # Tous les chemins commençant par "/search" ne sont accessibles qu'aux roles admin ou student.
+        # Cette route correspond à la recherche de students
+        - { path: ^/search, roles: [ROLE_ADMIN, ROLE_STUDENT] }

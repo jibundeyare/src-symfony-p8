@@ -88,7 +88,7 @@ class AppController extends AbstractController
         $studentSearchForm->handleRequest($request);
 
         if ($studentSearchForm->isSubmitted() && $studentSearchForm->isValid()) {
-            $keyword = $studentSearchForm->getData()['keyword'];
+            $keyword = $studentSearchForm->getData()['q'];
             $students = $studentRepository->findByFirstnameOrLastname($keyword);
         }
 

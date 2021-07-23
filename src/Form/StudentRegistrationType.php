@@ -20,9 +20,8 @@ class StudentRegistrationType extends AbstractType
     {
         $builder
             ->add('user', RegistrationFormType::class, [
-                'label_attr' => [
-                    'class' => 'd-none',
-                ]
+                // Masquage du label (le nom) du champ
+                'label' => false,
             ])
             ->add('firstname')
             ->add('lastname')

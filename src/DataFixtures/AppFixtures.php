@@ -2,9 +2,11 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Client;
 use App\Entity\Project;
 use App\Entity\SchoolYear;
 use App\Entity\Student;
+use App\Entity\Tag;
 use App\Entity\Teacher;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -66,15 +68,23 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
             $projectsCount = (int) ($studentsCount / $studentsPerProject) + 1;
         }
 
+        // On va créer autant de clients qu'il y a de projets.
+        $clientsCount = $projectsCount;
+
         // Appel des fonctions qui vont créer les objets dans la BDD.
         // La fonction loadAdmins() ne renvoit pas de données mais les autres
         // fontions renvoit des données qui sont nécessaires à d'autres fonctions.
         $this->loadAdmins($manager, 3);
         $schoolYears = $this->loadSchoolYears($manager, $schoolYearCount);
+
         // La fonction loadStudents() a besoin de la liste des school years.
         $students = $this->loadStudents($manager, $schoolYears, $studentsPerSchoolYear, $studentsCount);
-        // La fonction loadProjects() a besoin de la liste des students.
-        $projects = $this->loadProjects($manager, $students, $studentsPerProject, $projectsCount);
+
+        $clients = $this->loadClients($manager, $clientsCount);
+
+        // La fonction loadProjects() a besoin de la liste des students et des clients.
+        $projects = $this->loadProjects($manager, $students, $studentsPerProject, $clients, $projectsCount);
+
         // La fonction loadTeachers() a besoin de la liste des projects.
         $teachers = $this->loadTeachers($manager, $projects, 20);
 
@@ -291,7 +301,83 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
         return $students;
     }
 
-    public function loadProjects(ObjectManager $manager, array $students, int $studentsPerProject, int $count)
+    public function loadClients(ObjectManager $manager, int $count)
+    {
+        // Création d'un tableau qui contiendra les clients qu'on va créer.
+        // La fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
+        // de création d'objets puissent les utiliser.
+        $clients = [];
+
+        // Création d'un nouveau user.
+        $user = new User();
+        $user->setEmail('client@example.com');
+        // Hachage du mot de passe.
+        $password = $this->encoder->encodePassword($user, '123');
+        $user->setPassword($password);
+        // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+        // est libre mais il vaut mieux suivre la convention
+        // proposée par Symfony.
+        $user->setRoles(['ROLE_CLIENT']);
+
+        // Demande d'enregistrement d'un objet dans la BDD.
+        $manager->persist($user);
+
+        // Création d'un nouveau client.
+        $client = new Client();
+        $client->setFirstname('Client');
+        $client->setLastname('Client');
+        $client->setPhone('0612345678');
+        // Association d'un client et d'un user.
+        $client->setUser($user);
+
+        // Demande d'enregistrement d'un objet dans la BDD
+        $manager->persist($client);
+
+        // Ajout du premier client créé à la liste.
+        $clients[] = $client;
+
+        // Création de clients avec des données aléatoires.
+        // On démarre la boucle for avec $i = 1 et non $i = 0
+        // car on a « déjà fait le premier tour » de la boucle
+        // quand on a créé notre premier client ci-dessus.
+        // Si le développeur demande N clients, il faut retrancher
+        // le client qui a été créé ci-dessus et en créer N-1
+        // dans la boucle for.
+        for ($i = 1; $i < $count; $i++) {
+            // Création d'un nouveau user.
+            $user = new User();
+            $user->setEmail($this->faker->email());
+            // Hachage du mot de passe.
+            $password = $this->encoder->encodePassword($user, '123');
+            $user->setPassword($password);
+            // Le format de la chaîne de caractères ROLE_FOO_BAR_BAZ
+            // est libre mais il vaut mieux suivre la convention
+            // proposée par Symfony.
+            $user->setRoles(['ROLE_CLIENT']);
+
+            // Demande d'enregistrement d'un objet dans la BDD
+            $manager->persist($user);
+
+            // Création d'un nouveau client.
+            $client = new Client();
+            $client->setFirstname($this->faker->firstname());
+            $client->setLastname($this->faker->lastname());
+            $client->setPhone($this->faker->phoneNumber());
+            // Association d'un client et d'un user.
+            $client->setUser($user);
+
+            // Demande d'enregistrement d'un objet dans la BDD.
+            $manager->persist($client);
+
+            // Ajout du client créé à la liste.
+            $clients[] = $client;
+        }
+
+        // Renvoi de la liste des clients créés.
+        return $clients;
+    }
+
+    public function loadProjects(ObjectManager $manager, array $students, int $studentsPerProject, array $clients, int $count)
     {
         // Création d'un tableau qui contiendra les projects qu'on va créer.
         // La fonction va pouvoir renvoyer ce tableau pour que d'autres fonctions
@@ -325,6 +411,22 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
                 break;
             }
         }
+
+        // Création d'un compteur qui contient l'index du client en cours
+        // dans le tableau des clients.
+        // Assez logiquement, le premier index est 0 car on commence par
+        // utiliser le premier client.
+        $clientIndex = 0;
+
+        // Récupération du premier client de la liste.
+        $client = $clients[$clientIndex];
+
+        // Association d'un client et d'un project
+        $project->addClient($client);
+
+        // Incrémentation de l'index des clients.
+        // Au prochain tour, c'est le client suivant qui sera utilisé.
+        $clientIndex++;
 
         // Demande d'enregistrement d'un objet dans la BDD.
         $manager->persist($project);
@@ -362,7 +464,17 @@ class AppFixtures extends Fixture implements FixtureGroupInterface
                     break;
                 }
             }
-        
+
+            // Récupération d'un client précisé par l'index $clientIndex.
+            $client = $clients[$clientIndex];
+
+            // Association d'un client et d'un project
+            $project->addClient($client);
+
+            // Incrémentation de l'index des clients.
+            // Au prochain tour, c'est le client suivant qui sera utilisé.
+            $clientIndex++;
+
             // Demande d'enregistrement d'un objet dans la BDD.
             $manager->persist($project);
 
