@@ -44,10 +44,27 @@
                   <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
                 </li>
               </ul>
-              <form class="form-inline my-2 my-lg-0" method="post">
-                <input name="search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </form>
+              {#
+              Le formulaire de recherche des students est affiché dans toutes les pages (c-à-d
+              toutes les routes). Mais il n'est vraiment utilisé que dans la route "app_search".
+              Au lieu de créer le formulaire dans toutes les routes (c-à-d dans chaque fonction
+              de chaque contrôleur), ce qui ferait beaucoup trop de copier-coller, on va procéder
+              plus intelligemment.
+              1) On n'initialise la variable studentSearchForm que dans la route "app_search".
+              2) Dans la vue, si la variable studentSearchForm n'est pas initialisée, on utilise
+              le service StudentSearchFormViewFactory pour créer la vue du formulaire.
+              Pour info la variable du service "studentSearchFormViewFactory" est initialisée
+              dans "config/packages/twig.yaml".
+              Et le service se trouve dans le fichier "src/Service/StudentSearchFormViewFactory.php".
+              #}
+              {% if studentSearchForm is not defined %}
+                {% set studentSearchForm = studentSearchFormViewFactory.create %}
+              {% endif %}
+              {# Ce formulaire remplace celui qui est hard codé quand on copie colle la nav "par défaut" de bootstrap #}
+              {{ form_start(studentSearchForm) }}
+                {{ form_widget(studentSearchForm) }}
+                <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
+              {{ form_end(studentSearchForm) }}
             </div>
           </nav>
 

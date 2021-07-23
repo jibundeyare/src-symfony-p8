@@ -3,4 +3,9 @@ twig:
     debug: '%kernel.debug%'
     strict_variables: '%kernel.debug%'
     exception_controller: null
+    # active le thème bootstrap 4 lors de l'affichage des formulaires
     form_themes: ['bootstrap_4_layout.html.twig']
+    globals:
+        # initialise une variable nommée studentSearchFormViewFactory qui contient
+        # un service qui permet de créer la vue dur formulaire de recherche des students
+        studentSearchFormViewFactory: '@App\Service\StudentSearchFormViewFactory'

@@ -51,7 +51,7 @@ class StudentRepository extends ServiceEntityRepository
             ->orderBy('s.firstname', 'ASC')
             // En cas de firstname identiqu, on ajoute un tri par
             // lastname en ordre croissant (a, b, c, ...).
-            ->orderBy('s.lastname', 'ASC')
+            ->AddOrderBy('s.lastname', 'ASC')
             // Récupération d'une requête qui n'attend qu'à être exécutée.
             ->getQuery()
             // Exécution de la requête.
