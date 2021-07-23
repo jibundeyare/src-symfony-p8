@@ -69,8 +69,11 @@ class StudentSearchType extends AbstractType
     // Normalement le préfixe devrait être "student_search" et le champ
     // keyword devraient avoir un attribut name du type "student_search[keyword]".
     // En choisissant un préfixe nulle, le name du champ devient simplement "keyword".
-    // public function getBlockPrefix()
-    // {
-    //     return null;
-    // }
+    // Cette fonctionnalité est utile si vous décidez (ce que je ne recommande pas) de
+    // laisser le formulaire en dur en HTML dans le tempate twig et que l'attribut name
+    // a une valeur du type "keyword" ou "search" ou autre sans la partie "student_search[...]".
+    public function getBlockPrefix()
+    {
+        return null;
+    }
 }
